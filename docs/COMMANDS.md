@@ -1,6 +1,6 @@
 # Command Reference
 
-Full reference for all 18 slash commands in the Claude Code Team Toolkit.
+Full reference for all 20 slash commands in the Claude Code Team Toolkit.
 
 ---
 
@@ -375,3 +375,42 @@ Next time:
 ```
 
 This is the **command that creates commands** -- how the toolkit grows itself.
+
+---
+
+## Collaborate -- Work Effectively With Your Team
+
+### `/flag`
+
+**When to use:** You found something that looks wrong but don't want to fix it unilaterally -- it's pre-existing, might be intentional, or needs team context.
+
+```
+/flag MPC_SERVER_HOST in .env.example should be MCP_SERVER_HOST -- typo or intentional?
+/flag scan results from latest /verify
+```
+
+Investigates the finding (git blame, grep for context, checks if it's consumed elsewhere), classifies it (CONFIRMED / SUSPICIOUS / COSMETIC), and posts a structured comment to the appropriate channel (PR comment, GitHub issue, or direct message) with evidence and impact analysis.
+
+**Example output (posted as PR comment):**
+```
+## [CONFIRMED] Typo: MPC_ vs MCP_ in .env.example
+
+Where: .env.example:11-12
+What: Uses MPC_SERVER_HOST but Config expects MCP_SERVER_HOST
+Impact: Silent misconfiguration (defaults happen to match, no breakage)
+Evidence: git blame shows added 3 months ago by @dev
+
+Not fixing because: Pre-existing, out of scope for current PR.
+@team -- intentional or should I fix in a follow-up?
+```
+
+### `/sync-skill-docs`
+
+**When to use:** After creating or updating a slash command or agent, sync it to the team toolkit repo with documentation.
+
+```
+/sync-skill-docs flag
+/sync-skill-docs all
+```
+
+Copies the skill file to the toolkit repo, updates README.md, docs/COMMANDS.md, TOOLKIT.md, and optionally PLAYBOOK.md. Creates a feature branch and commits -- never pushes without your approval.

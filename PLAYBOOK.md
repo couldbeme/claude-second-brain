@@ -90,6 +90,16 @@ Recipes, prompt patterns, and agent composition strategies for common developmen
 /verify                                     # 6. Confirm nothing broke
 ```
 
+### Found Something Suspicious During a PR
+
+```
+/flag [description of what looks wrong]       # 1. Investigate and classify
+                                               # 2. Posts structured finding to PR/issue
+/commit-push-pr                                # 3. Continue with your own work
+```
+
+Don't fix pre-existing issues in unrelated PRs -- flag them, get team input, fix in a follow-up.
+
 ---
 
 ## Context-First Checklist
