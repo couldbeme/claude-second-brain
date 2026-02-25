@@ -2,6 +2,8 @@
 
 17 slash commands + 7 specialized agents for [Claude Code](https://docs.anthropic.com/en/docs/claude-code) that enforce consistent, high-quality development workflows.
 
+**New here?** Jump to [Your First 5 Minutes](#your-first-5-minutes) for a hands-on walkthrough.
+
 ## Quick Start
 
 ```bash
@@ -26,6 +28,17 @@ cp CLAUDE.md.template ~/.claude/CLAUDE.md
 ```
 
 For project-scoped install, copy into `your-project/.claude/` instead.
+
+## Documentation
+
+| Doc | What it covers |
+|-----|----------------|
+| **[TOOLKIT.md](TOOLKIT.md)** | Complete guide — setup, 9 Before & After scenarios, every command and agent explained with examples |
+| **[PLAYBOOK.md](PLAYBOOK.md)** | Daily workflow recipes, prompt patterns, agent composition strategies, AI/LLM security patterns |
+| **[SETUP-MEMORY.md](SETUP-MEMORY.md)** | Memory system installation — LM Studio, MCP server, hybrid search |
+| **[CLAUDE.md.template](CLAUDE.md.template)** | Global rules template — TDD, security, self-learning protocol |
+
+Start with **TOOLKIT.md** for the full picture. Use **PLAYBOOK.md** as a daily reference.
 
 ## What's Included
 
@@ -70,15 +83,19 @@ Persistent knowledge base that lets Claude Code remember across sessions. Uses l
 - **LM Studio is optional** -- without it, search falls back to keyword-only (the memory system itself is required)
 - **See [SETUP-MEMORY.md](SETUP-MEMORY.md)** for installation guide
 
-### Other Files
+## Your First 5 Minutes
 
-| File | Purpose |
-|------|---------|
-| `TOOLKIT.md` | Full guide with examples -- **read this for the presentation** |
-| `CLAUDE.md.template` | Global rules template (TDD, security, communication style) |
-| `SETUP-MEMORY.md` | Step-by-step memory system installation guide |
-| `PLAYBOOK.md` | Practical recipes, prompt patterns, and agent composition strategies |
-| `memory-mcp/` | MCP server source code + requirements.txt + settings template |
+After installing, open Claude Code in any project and run:
+
+```
+/guide tour                          # see everything available
+/status                              # where am I? what's in flight?
+/tdd Add input validation to signup  # build something with TDD
+/verify                              # full health check
+/learn from session                  # save what you discovered
+```
+
+For a detailed walkthrough with expected outputs, see the **[Your First 5 Minutes](TOOLKIT.md#your-first-5-minutes)** section in TOOLKIT.md.
 
 ## How It Works
 
