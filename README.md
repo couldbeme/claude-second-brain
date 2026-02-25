@@ -117,6 +117,22 @@ argument-hint: Placeholder text for the argument
 
 **CLAUDE.md** is a project-level file that Claude Code reads at session start. It stores commands, architecture notes, domain rules, and gotchas -- persistent context across sessions.
 
+## Coming Soon
+
+Documentation is being restructured for easier navigation:
+
+| Doc | What's changing |
+|-----|-----------------|
+| **QUICK-START.md** | Standalone getting started guide with a hands-on sandbox example |
+| **TOOLKIT.md** | Slimmed from 2000+ lines to ~500 — Before & After scenarios only |
+| **docs/COMMANDS.md** | Full reference for all 18 commands (extracted from TOOLKIT.md) |
+| **docs/AGENTS.md** | Full reference for all 7 agents (extracted from TOOLKIT.md) |
+| **docs/SELF-LEARNING.md** | How the 5-layer learning system works |
+| **docs/ADVANCED-PATTERNS.md** | Deep dives — skills crystallization, context recovery, post-audit remediation |
+| **examples/sandbox/** | A small broken Python app to practice toolkit commands on |
+
+The sandbox lets new users run `/scan`, `/tdd`, and `/verify` on real (intentionally buggy) code — learning by doing instead of reading.
+
 ## Contributing
 
 Built a useful workflow? Add it:
