@@ -43,7 +43,7 @@ This toolkit codifies engineering best practices into repeatable, quality-enforc
 | `/gap-analysis` | Find missing tests, docs, error handling, types |
 | `/research` | Deep 3-track technical research with sources |
 | `/orchestrate` | Decompose complex tasks into multi-agent workflows |
-| `/metaprompt` | Generate optimized slash commands from a task description |
+| `/metaprompt` | Generate optimized prompts from a task description |
 | `/sync-memories` | Export/import knowledge between machines |
 | `/guide` | Interactive toolkit assistant -- suggests commands and workflows |
 | `/diagnose` | Interpret error screenshots, logs, or stack traces and fix |
