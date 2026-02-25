@@ -47,6 +47,14 @@ Launch parallel analysis across these dimensions:
 - Review memory usage patterns (large object retention, missing cleanup)
 - Return: performance concerns ranked by production impact
 
+### Dimension 6: AI/LLM Security
+- Scan for prompt injection vectors (user input concatenated into LLM prompts)
+- Check agent and MCP server permissions (least privilege)
+- Verify memory/vector stores don't contain secrets or PII
+- Check model API authentication and input/output guardrails
+- Detect adversarial patterns in stored data ("ignore previous instructions", jailbreak attempts)
+- Return: AI-specific findings ranked by severity
+
 ## Synthesis
 
 After all dimensions are analyzed:
@@ -63,3 +71,4 @@ After all dimensions are analyzed:
 | Quality | X/10 | ... |
 | Docs | X/10 | ... |
 | Performance | X/10 | ... |
+| AI/LLM | X/10 | ... |
