@@ -1406,7 +1406,7 @@ Three levels of impact:
 
 1. **Individual** — Your prompts produce better results right now, without prompt engineering expertise
 2. **Team** — Crystallize your best workflows into reusable commands anyone can run
-3. **Organization** — The toolkit grows itself. 15 commands become 30, then 50. Every recurring workflow becomes a one-liner
+3. **Organization** — The toolkit grows itself. Commands become 30, then 50. Every recurring workflow becomes a one-liner
 
 ---
 
