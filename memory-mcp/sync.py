@@ -5,12 +5,16 @@ Usage:
     python sync.py import              # Import from JSON, merging with local
     python sync.py export --pretty     # Human-readable JSON
     python sync.py stats               # Show sync status
+    python sync.py scheduled           # Export + auto git commit (for cron/launchd)
+    python sync.py scheduled --push    # Export + git commit + push
 """
 
 from __future__ import annotations
 
 import json
+import logging
 import os
+import subprocess
 import sys
 from datetime import datetime
 
@@ -21,8 +25,8 @@ DEFAULT_EXPORT_PATH = os.path.expanduser("~/.claude/memory/memories-export.json"
 DEFAULT_DB_PATH = os.path.expanduser("~/.claude/memory/memory.db")
 
 
-def export_memories(pretty: bool = False, db_path: str = DEFAULT_DB_PATH, export_path: str = DEFAULT_EXPORT_PATH) -> None:
-    """Export all memories to JSON file."""
+def export_memories(pretty: bool = False, db_path: str = DEFAULT_DB_PATH, export_path: str = DEFAULT_EXPORT_PATH) -> int:
+    """Export all memories to JSON file. Returns the count of exported memories."""
     db = MemoryDB(db_path)
     memories = db.list_memories(limit=10000, sort_by="created_at", sort_order="asc")
 
@@ -40,8 +44,10 @@ def export_memories(pretty: bool = False, db_path: str = DEFAULT_DB_PATH, export
         json.dump(full_memories, f, indent=2 if pretty else None, ensure_ascii=False)
 
     db.close()
-    print(f"Exported {len(full_memories)} memories to {export_path}")
+    count = len(full_memories)
+    print(f"Exported {count} memories to {export_path}")
     print(f"File size: {os.path.getsize(export_path):,} bytes")
+    return count
 
 
 def import_memories(db_path: str = DEFAULT_DB_PATH, export_path: str = DEFAULT_EXPORT_PATH) -> None:
@@ -130,6 +136,66 @@ def show_stats(db_path: str = DEFAULT_DB_PATH, export_path: str = DEFAULT_EXPORT
         print("Export file: not found (run 'python sync.py export' first)")
 
 
+log = logging.getLogger("sync")
+
+
+def scheduled_export(
+    db_path: str = DEFAULT_DB_PATH,
+    export_path: str = DEFAULT_EXPORT_PATH,
+    push: bool = False,
+) -> dict:
+    """Export memories and auto-commit to git. Designed for cron/launchd.
+
+    Returns a summary dict: {exported, committed, pushed, error}.
+    Never raises — all errors are caught and returned in the dict.
+    """
+    result = {"exported": 0, "committed": False, "pushed": False, "error": None}
+
+    try:
+        # 1. Export
+        result["exported"] = export_memories(
+            db_path=db_path, export_path=export_path, pretty=True
+        )
+
+        # 2. Git add
+        subprocess.run(
+            ["git", "add", export_path],
+            capture_output=True, text=True, check=True,
+        )
+
+        # 3. Check if there are staged changes
+        diff_result = subprocess.run(
+            ["git", "diff", "--cached", "--quiet", export_path],
+            capture_output=True, text=True,
+        )
+        if diff_result.returncode == 0:
+            # No changes — nothing to commit
+            log.info("No changes to commit")
+            return result
+
+        # 4. Commit with timestamp
+        timestamp = datetime.now().strftime("%Y-%m-%d %H:%M")
+        subprocess.run(
+            ["git", "commit", "-m", f"sync: auto-export memories ({timestamp})"],
+            capture_output=True, text=True, check=True,
+        )
+        result["committed"] = True
+
+        # 5. Optional push
+        if push:
+            subprocess.run(
+                ["git", "push"],
+                capture_output=True, text=True, check=True,
+            )
+            result["pushed"] = True
+
+    except Exception as e:
+        log.error("Scheduled export failed: %s", e)
+        result["error"] = str(e)
+
+    return result
+
+
 def main():
     if len(sys.argv) < 2:
         print(__doc__)
@@ -142,6 +208,12 @@ def main():
         import_memories()
     elif cmd == "stats":
         show_stats()
+    elif cmd == "scheduled":
+        result = scheduled_export(push="--push" in sys.argv)
+        if result["error"]:
+            print(f"Error: {result['error']}")
+            sys.exit(1)
+        print(f"Exported: {result['exported']}, Committed: {result['committed']}, Pushed: {result['pushed']}")
     else:
         print(f"Unknown command: {cmd}")
         print(__doc__)

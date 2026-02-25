@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--
+  Automated memory export for Claude Code toolkit.
+  Copy to ~/Library/LaunchAgents/ and replace REPLACE_WITH_* placeholders.
+
+  Install:
+    cp com.claude.sync-memories.plist ~/Library/LaunchAgents/com.claude.sync-memories.plist
+    launchctl load ~/Library/LaunchAgents/com.claude.sync-memories.plist
+
+  Uninstall:
+    launchctl unload ~/Library/LaunchAgents/com.claude.sync-memories.plist
+    rm ~/Library/LaunchAgents/com.claude.sync-memories.plist
+
+  Check status:
+    launchctl list | grep claude
+
+  View logs:
+    tail -f ~/.claude/memory/sync.log
+-->
+<plist version="1.0">
+<dict>
+  <key>Label</key>
+  <string>com.claude.sync-memories</string>
+
+  <key>ProgramArguments</key>
+  <array>
+    <string>REPLACE_WITH_VENV_PATH/.venv/bin/python3</string>
+    <string>REPLACE_WITH_MEMORY_MCP_PATH/sync.py</string>
+    <string>scheduled</string>
+  </array>
+
+  <key>StartInterval</key>
+  <integer>3600</integer>
+
+  <key>StandardOutPath</key>
+  <string>REPLACE_WITH_HOME/.claude/memory/sync.log</string>
+
+  <key>StandardErrorPath</key>
+  <string>REPLACE_WITH_HOME/.claude/memory/sync-error.log</string>
+
+  <key>RunAtLoad</key>
+  <false/>
+</dict>
+</plist>
