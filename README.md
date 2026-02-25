@@ -1,6 +1,6 @@
 # Claude Code Team Toolkit
 
-17 slash commands + 7 specialized agents for [Claude Code](https://docs.anthropic.com/en/docs/claude-code) that enforce consistent, high-quality development workflows.
+18 slash commands + 7 specialized agents for [Claude Code](https://docs.anthropic.com/en/docs/claude-code) that enforce consistent, high-quality development workflows.
 
 **New here?** Jump to [Your First 5 Minutes](#your-first-5-minutes) for a hands-on walkthrough.
 
@@ -37,12 +37,14 @@ For project-scoped install, copy into `your-project/.claude/` instead.
 | **[PLAYBOOK.md](PLAYBOOK.md)** | Daily workflow recipes, prompt patterns, agent composition strategies, AI/LLM security patterns |
 | **[SETUP-MEMORY.md](SETUP-MEMORY.md)** | Memory system installation — LM Studio, MCP server, hybrid search |
 | **[CLAUDE.md.template](CLAUDE.md.template)** | Global rules template — TDD, security, self-learning protocol |
+| **[docs/ROLLOUT-GUIDE.md](docs/ROLLOUT-GUIDE.md)** | Operational guide — when to scan, how to interpret, how teams act on findings |
+| **[docs/ANNOUNCEMENT.md](docs/ANNOUNCEMENT.md)** | Internal rollout announcement template for your team |
 
 Start with **TOOLKIT.md** for the full picture. Use **PLAYBOOK.md** as a daily reference.
 
 ## What's Included
 
-### Commands (17)
+### Commands (18)
 
 | Command | Description |
 |---------|-------------|
@@ -63,6 +65,7 @@ Start with **TOOLKIT.md** for the full picture. Use **PLAYBOOK.md** as a daily r
 | `/sync-memories` | Export/import knowledge between machines |
 | `/guide` | Interactive toolkit assistant -- suggests commands and workflows for your task |
 | `/diagnose` | Interpret error screenshots, logs, or stack traces and diagnose + fix |
+| `/scan` | Full repository health scan -- security, quality, gaps, and operational health in one report |
 
 ### Agents (7)
 

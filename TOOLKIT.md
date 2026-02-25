@@ -1,6 +1,6 @@
 # Claude Code Team Toolkit
 
-### 17 Slash Commands + 7 Agents for High-Quality Development
+### 18 Slash Commands + 7 Agents for High-Quality Development
 
 Slash commands are reusable workflow prompts for Claude Code. Type `/command-name` and Claude follows a structured process instead of ad-hoc prompting. Agents are specialized subprocesses that handle focused tasks autonomously.
 
@@ -75,7 +75,7 @@ Open Claude Code in any existing project and type:
 /guide tour
 ```
 
-Claude responds with a categorized overview of all 17 commands. You now know what's available.
+Claude responds with a categorized overview of all 18 commands. You now know what's available.
 
 ### Minute 2: Understand what you're working with
 
@@ -179,6 +179,7 @@ Five commands. Five minutes. You went from "what is this project?" to "PR is ope
 | `/sync-memories` | Export/import knowledge between machines |
 | `/guide` | Interactive toolkit assistant -- suggests commands and workflows |
 | `/diagnose` | Interpret error screenshots, logs, or stack traces and fix |
+| `/scan` | Full repository health scan -- security, quality, gaps, operational health |
 
 ---
 
@@ -611,7 +612,7 @@ cause, not just the symptom.
 Want me to run `/recall auth bug` now?
 ```
 
-**Tour mode:** Run `/guide tour` to get a categorized overview of all 17 commands grouped by purpose (Orient, Build, Analyze, Research & Learn, Power Tools).
+**Tour mode:** Run `/guide tour` to get a categorized overview of all 18 commands grouped by purpose (Orient, Build, Analyze, Research & Learn, Power Tools).
 
 ---
 

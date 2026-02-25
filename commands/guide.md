@@ -201,6 +201,7 @@ BUILD — write code the right way
   /commit-push-pr  Quality-gated shipping
 
 ANALYZE — find problems before they find you
+  /scan            Full repo health scan -- one report, all dimensions
   /audit           6-dimension codebase audit with scorecard
   /gap-analysis    Find missing tests, docs, error handling
 
