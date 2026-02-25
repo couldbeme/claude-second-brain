@@ -1,6 +1,6 @@
 # Claude Code Team Toolkit
 
-20 slash commands + 7 specialized agents for [Claude Code](https://docs.anthropic.com/en/docs/claude-code) that enforce consistent, high-quality development workflows.
+21 slash commands + 7 specialized agents for [Claude Code](https://docs.anthropic.com/en/docs/claude-code) that enforce consistent, high-quality development workflows.
 
 **New here?** Jump to [QUICK-START.md](QUICK-START.md) for install + a hands-on walkthrough.
 
@@ -36,7 +36,7 @@ For project-scoped install, copy into `your-project/.claude/` instead.
 | **[QUICK-START.md](QUICK-START.md)** | Install guide + "Your First 5 Minutes" walkthrough + hands-on sandbox |
 | **[TOOLKIT.md](TOOLKIT.md)** | Why the toolkit matters — 9 Before & After scenarios |
 | **[PLAYBOOK.md](PLAYBOOK.md)** | Daily workflow recipes, prompt patterns, agent composition, AI/LLM security |
-| **[docs/COMMANDS.md](docs/COMMANDS.md)** | Full reference for all 20 commands |
+| **[docs/COMMANDS.md](docs/COMMANDS.md)** | Full reference for all 21 commands |
 | **[docs/AGENTS.md](docs/AGENTS.md)** | Full reference for all 7 agents |
 | **[docs/SELF-LEARNING.md](docs/SELF-LEARNING.md)** | CLAUDE.md workflow + 5-layer learning system |
 | **[docs/ADVANCED-PATTERNS.md](docs/ADVANCED-PATTERNS.md)** | Skills crystallization, context recovery, post-audit remediation |
@@ -49,7 +49,7 @@ Start with **QUICK-START.md** to get set up. Read **TOOLKIT.md** to see why it m
 
 ## What's Included
 
-### Commands (20)
+### Commands (21)
 
 | Command | Description |
 |---------|-------------|
@@ -72,6 +72,7 @@ Start with **QUICK-START.md** to get set up. Read **TOOLKIT.md** to see why it m
 | `/diagnose` | Interpret error screenshots, logs, or stack traces and diagnose + fix |
 | `/scan` | Full repository health scan -- security, quality, gaps, and operational health in one report |
 | `/flag` | Flag findings for team review instead of fixing them unilaterally |
+| `/resolve-pr` | Fetch PR review comments, fix code, reply politely, push |
 | `/sync-skill-docs` | Sync new skills to the team toolkit repo with documentation updates |
 
 ### Agents (7)

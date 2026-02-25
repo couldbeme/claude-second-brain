@@ -1,6 +1,6 @@
 # Command Reference
 
-Full reference for all 20 slash commands in the Claude Code Team Toolkit.
+Full reference for all 21 slash commands in the Claude Code Team Toolkit.
 
 ---
 
@@ -74,7 +74,7 @@ cause, not just the symptom.
 Want me to run `/recall auth bug` now?
 ```
 
-**Tour mode:** Run `/guide tour` to get a categorized overview of all 20 commands grouped by purpose (Orient, Build, Analyze, Research & Learn, Power Tools).
+**Tour mode:** Run `/guide tour` to get a categorized overview of all 21 commands grouped by purpose (Orient, Build, Analyze, Research & Learn, Power Tools).
 
 ---
 
@@ -402,6 +402,32 @@ Evidence: git blame shows added 3 months ago by @dev
 
 Not fixing because: Pre-existing, out of scope for current PR.
 @team -- intentional or should I fix in a follow-up?
+```
+
+### `/resolve-pr`
+
+**When to use:** After receiving review comments on a PR, when you want to address all feedback in one pass.
+
+```
+/resolve-pr 188
+/resolve-pr latest
+```
+
+Fetches all unresolved review comments, classifies each (direct fix, design concern, clarification, style nit), applies code fixes, runs tests, replies politely to each comment, commits, and pushes. Saves team preferences and reviewer patterns to memory.
+
+**Example output:**
+```
+PR #188 — Round 2 Review Resolution
+=====================================
+Comments addressed: 2/2
+  reviewer gcp_clients.py:157 — Removed try-catch-reraise, let exceptions propagate
+  reviewer server.py:180 — Removed /api/env endpoint, replaced with template injection
+
+Tests: 66/66 pass
+Commit: b392a1d
+Pushed: yes
+
+Learnings saved: 3
 ```
 
 ### `/sync-skill-docs`

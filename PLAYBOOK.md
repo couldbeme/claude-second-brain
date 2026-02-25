@@ -100,6 +100,23 @@ Recipes, prompt patterns, and agent composition strategies for common developmen
 
 Don't fix pre-existing issues in unrelated PRs -- flag them, get team input, fix in a follow-up.
 
+### Addressing PR Review Comments
+
+```
+/resolve-pr 188                                  # 1. Fetch, classify, fix, reply, push
+/learn from session                              # 2. Capture reviewer patterns
+```
+
+Or do it step-by-step:
+```
+/recall [reviewer's concern]                     # 1. Check if there's existing context
+# Read each comment, understand intent
+# Fix code, run tests
+# Reply politely with what changed and why
+/commit-push-pr                                  # 2. Ship the fixes
+/learn [what reviewers taught you]               # 3. Save team preferences
+```
+
 ---
 
 ## Context-First Checklist

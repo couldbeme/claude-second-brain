@@ -1,6 +1,6 @@
 # Claude Code Team Toolkit
 
-### 20 Slash Commands + 7 Agents for High-Quality Development
+### 21 Slash Commands + 7 Agents for High-Quality Development
 
 Slash commands are reusable workflow prompts for Claude Code. Type `/command-name` and Claude follows a structured process instead of ad-hoc prompting. Agents are specialized subprocesses that handle focused tasks autonomously.
 
@@ -15,7 +15,7 @@ This toolkit codifies engineering best practices into repeatable, quality-enforc
 | **[QUICK-START.md](QUICK-START.md)** | Install guide + "Your First 5 Minutes" walkthrough + hands-on sandbox |
 | **This file** | Why the toolkit matters -- 9 Before & After scenarios |
 | **[PLAYBOOK.md](PLAYBOOK.md)** | Daily workflow recipes, prompt patterns, agent composition, AI/LLM security |
-| **[docs/COMMANDS.md](docs/COMMANDS.md)** | Full reference for all 20 commands |
+| **[docs/COMMANDS.md](docs/COMMANDS.md)** | Full reference for all 21 commands |
 | **[docs/AGENTS.md](docs/AGENTS.md)** | Full reference for all 7 agents |
 | **[docs/SELF-LEARNING.md](docs/SELF-LEARNING.md)** | CLAUDE.md workflow + 5-layer learning system |
 | **[docs/ADVANCED-PATTERNS.md](docs/ADVANCED-PATTERNS.md)** | Skills crystallization, context recovery, post-audit remediation |
@@ -49,6 +49,7 @@ This toolkit codifies engineering best practices into repeatable, quality-enforc
 | `/diagnose` | Interpret error screenshots, logs, or stack traces and fix |
 | `/scan` | Full repository health scan -- security, quality, gaps, operational health |
 | `/flag` | Flag findings for team review instead of fixing unilaterally |
+| `/resolve-pr` | Fetch PR review comments, fix code, reply politely, push |
 | `/sync-skill-docs` | Sync new skills to the team toolkit repo with docs |
 
 For detailed usage, examples, and output formats, see **[docs/COMMANDS.md](docs/COMMANDS.md)**.
