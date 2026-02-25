@@ -333,6 +333,8 @@ class TestExportMemoriesFileHandle:
         mock_db = MagicMock()
         mock_db.list_memories.return_value = []
         mock_db.get.return_value = None
+        mock_db.__enter__ = MagicMock(return_value=mock_db)
+        mock_db.__exit__ = MagicMock(return_value=False)
 
         with patch("sync.MemoryDB", return_value=mock_db):
             sync.export_memories(db_path=db_file, export_path=export_file)
@@ -439,6 +441,8 @@ class TestImportMemoriesJsonError:
         db_file = str(tmp_path / "mem.db")
         mock_db = MagicMock()
         mock_db.get.return_value = None  # treat as new memory
+        mock_db.__enter__ = MagicMock(return_value=mock_db)
+        mock_db.__exit__ = MagicMock(return_value=False)
 
         with patch("sync.MemoryDB", return_value=mock_db):
             sync.import_memories(

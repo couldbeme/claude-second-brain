@@ -103,9 +103,10 @@ class MemoryDB:
         source: str = "manual",
         session_id: Optional[str] = None,
         embedding: Optional[list[float]] = None,
+        mem_id: Optional[str] = None,
     ) -> str:
-        """Save a memory and return its ID."""
-        mem_id = _generate_id()
+        """Save a memory and return its ID. Pass mem_id to preserve an existing ID (e.g. during import)."""
+        mem_id = mem_id or _generate_id()
         tags_json = json.dumps(tags or [])
 
         self.conn.execute(

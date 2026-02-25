@@ -38,23 +38,21 @@ DEFAULT_REPO_DIR = os.environ.get("SYNC_REPO_DIR", None)
 
 def export_memories(pretty: bool = False, db_path: str = DEFAULT_DB_PATH, export_path: str = DEFAULT_EXPORT_PATH) -> int:
     """Export all memories to JSON file. Returns the count of exported memories."""
-    db = MemoryDB(db_path)
-    memories = db.list_memories(limit=10000, sort_by="created_at", sort_order="asc")
+    with MemoryDB(db_path) as db:
+        memories = db.list_memories(limit=10000, sort_by="created_at", sort_order="asc")
 
-    # Get full details for each memory
-    full_memories = []
-    for m in memories:
-        full = db.get(m["id"])
-        if full:
-            # Remove access_count from export (local metric)
-            full.pop("access_count", None)
-            full_memories.append(full)
+        # Get full details for each memory
+        full_memories = []
+        for m in memories:
+            full = db.get(m["id"])
+            if full:
+                # Remove access_count from export (local metric)
+                full.pop("access_count", None)
+                full_memories.append(full)
 
     os.makedirs(os.path.dirname(export_path), exist_ok=True)
     with open(export_path, "w") as f:
         json.dump(full_memories, f, indent=2 if pretty else None, ensure_ascii=False)
-
-    db.close()
     count = len(full_memories)
     print(f"Exported {count} memories to {export_path}")
     print(f"File size: {os.path.getsize(export_path):,} bytes")
@@ -75,64 +73,83 @@ def import_memories(db_path: str = DEFAULT_DB_PATH, export_path: str = DEFAULT_E
             print("Export file is corrupted or incomplete. Try re-exporting.")
             return
 
-    db = MemoryDB(db_path)
+    if not isinstance(incoming, list):
+        print("Export file has unexpected structure (expected a JSON array).")
+        return
 
     created = 0
     updated = 0
     skipped = 0
+    invalid = 0
 
-    for mem in incoming:
-        existing = db.get(mem["id"])
+    with MemoryDB(db_path) as db:
+        for mem in incoming:
+            # Validate required fields
+            if not isinstance(mem, dict) or not all(
+                k in mem for k in ("id", "content", "category")
+            ):
+                invalid += 1
+                continue
 
-        if existing is None:
-            # New memory -- create it
-            db.save(
-                content=mem["content"],
-                category=mem["category"],
-                summary=mem.get("summary"),
-                tags=mem.get("tags", []),
-                project=mem.get("project"),
-                importance=mem.get("importance", 5),
-                source=mem.get("source", "sync"),
-            )
-            created += 1
-        else:
-            # Existing -- check timestamps
-            incoming_ts = mem.get("updated_at", "")
-            local_ts = existing.get("updated_at", "")
+            existing = db.get(mem["id"])
 
-            if incoming_ts > local_ts:
-                # Incoming is newer -- update
-                db.update(
+            if existing is None:
+                # New memory -- create with original ID to prevent duplicates
+                db.save(
                     mem_id=mem["id"],
                     content=mem["content"],
+                    category=mem["category"],
                     summary=mem.get("summary"),
-                    tags=mem.get("tags"),
-                    importance=mem.get("importance"),
-                    category=mem.get("category"),
+                    tags=mem.get("tags", []),
+                    project=mem.get("project"),
+                    importance=mem.get("importance", 5),
+                    source=mem.get("source", "sync"),
                 )
-                updated += 1
+                created += 1
             else:
-                skipped += 1
+                # Existing -- check timestamps
+                incoming_ts = mem.get("updated_at", "")
+                local_ts = existing.get("updated_at", "")
 
-    db.close()
+                if incoming_ts > local_ts:
+                    # Incoming is newer -- update
+                    db.update(
+                        mem_id=mem["id"],
+                        content=mem["content"],
+                        summary=mem.get("summary"),
+                        tags=mem.get("tags"),
+                        importance=mem.get("importance"),
+                        category=mem.get("category"),
+                    )
+                    updated += 1
+                else:
+                    skipped += 1
+
     print(f"Import complete:")
     print(f"  Created: {created}")
     print(f"  Updated: {updated} (incoming was newer)")
     print(f"  Skipped: {skipped} (local was current or newer)")
+    if invalid:
+        print(f"  Invalid: {invalid} (missing required fields, skipped)")
 
 
 def show_stats(db_path: str = DEFAULT_DB_PATH, export_path: str = DEFAULT_EXPORT_PATH) -> None:
     """Show sync status."""
-    db = MemoryDB(db_path)
-    memories = db.list_memories(limit=10000)
-    db.close()
+    with MemoryDB(db_path) as db:
+        memories = db.list_memories(limit=10000)
 
     print(f"Local database: {len(memories)} memories")
 
     if os.path.exists(export_path):
         with open(export_path) as f:
-            exported = json.load(f)
+            try:
+                exported = json.load(f)
+            except json.JSONDecodeError:
+                print("Export file is corrupted. Run 'python sync.py export' to regenerate.")
+                return
+        if not isinstance(exported, list):
+            print("Export file has unexpected structure.")
+            return
         mtime = datetime.fromtimestamp(os.path.getmtime(export_path))
         print(f"Export file: {len(exported)} memories (last exported: {mtime:%Y-%m-%d %H:%M})")
 
