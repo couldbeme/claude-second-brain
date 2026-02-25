@@ -67,6 +67,7 @@ Why: Context first (don't reinvent), TDD for safety, docs for teammates, verify 
 
 **"Fix a bug"**
 ```
+0. /diagnose [screenshot or error] — got a screenshot? start here
 1. /recall [error message]         — was this seen before?
 2. /explain [affected module]      — understand the area
 3. /tdd Fix [the bug]              — test-first fix
@@ -195,6 +196,7 @@ ORIENT — understand before you build
 
 BUILD — write code the right way
   /tdd             Test-first development (red → green → refactor)
+  /diagnose        Got an error screenshot? Paste it, get a fix
   /verify          Full health check (tests, lint, build)
   /commit-push-pr  Quality-gated shipping
 

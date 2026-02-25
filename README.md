@@ -1,6 +1,6 @@
 # Claude Code Team Toolkit
 
-16 slash commands + 7 specialized agents for [Claude Code](https://docs.anthropic.com/en/docs/claude-code) that enforce consistent, high-quality development workflows.
+17 slash commands + 7 specialized agents for [Claude Code](https://docs.anthropic.com/en/docs/claude-code) that enforce consistent, high-quality development workflows.
 
 ## Quick Start
 
@@ -29,7 +29,7 @@ For project-scoped install, copy into `your-project/.claude/` instead.
 
 ## What's Included
 
-### Commands (16)
+### Commands (17)
 
 | Command | Description |
 |---------|-------------|
@@ -49,6 +49,7 @@ For project-scoped install, copy into `your-project/.claude/` instead.
 | `/metaprompt` | Generate optimized slash commands from a task description |
 | `/sync-memories` | Export/import knowledge between machines |
 | `/guide` | Interactive toolkit assistant -- suggests commands and workflows for your task |
+| `/diagnose` | Interpret error screenshots, logs, or stack traces and diagnose + fix |
 
 ### Agents (7)
 

@@ -72,6 +72,7 @@ Recipes, prompt patterns, and agent composition strategies for common developmen
 ### Investigating a Bug
 
 ```
+/diagnose [screenshot or error text]        # 0. Got a screenshot? Start here
 /recall [error message or symptom]          # 1. Was this seen before?
 /explain src/affected-module/               # 2. Understand the area
 /tdd Fix [the bug]                          # 3. Test-first fix

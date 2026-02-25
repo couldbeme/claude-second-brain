@@ -1,6 +1,6 @@
 # Claude Code Team Toolkit
 
-### 16 Slash Commands + 7 Agents for High-Quality Development
+### 17 Slash Commands + 7 Agents for High-Quality Development
 
 Slash commands are reusable workflow prompts for Claude Code. Type `/command-name` and Claude follows a structured process instead of ad-hoc prompting. Agents are specialized subprocesses that handle focused tasks autonomously.
 
@@ -74,6 +74,7 @@ Follow [SETUP-MEMORY.md](SETUP-MEMORY.md) to install the memory MCP server. This
 | `/metaprompt` | Generate optimized slash commands from a task description |
 | `/sync-memories` | Export/import knowledge between machines |
 | `/guide` | Interactive toolkit assistant -- suggests commands and workflows |
+| `/diagnose` | Interpret error screenshots, logs, or stack traces and fix |
 
 ---
 
@@ -399,6 +400,41 @@ Claude: [follows the engineered prompt]
 
 **The difference:** The basic prompt produces basic work. `/metaprompt` transforms it into a structured execution plan with phases, tool assignments, safety constraints, and verification -- the kind of prompt a senior engineer would write. You get expert-level prompt engineering without being a prompt engineer.
 
+### 9. Error screenshot → manual debugging vs. visual diagnosis
+
+**Without toolkit:**
+```
+[screenshot of a Python traceback in terminal]
+
+You:    [squint at screenshot, manually copy the error message]
+You:    [paste into Google: "TypeError cannot unpack non-iterable NoneType"]
+You:    [read 4 Stack Overflow answers, none match your exact case]
+You:    [manually search your codebase for the file mentioned in the trace]
+You:    [spend 20 minutes tracing the call chain to find the actual bug]
+You:    [fix it, forget to write a test, same bug returns 2 weeks later]
+```
+
+**With toolkit:**
+```
+/diagnose ~/Desktop/Screenshot 2026-02-25.png
+
+Claude: [reads the screenshot visually]
+        [extracts: TypeError at src/api/users.py:47, get_user() returns None]
+        [greps codebase for get_user, reads the function]
+        [searches memory for similar issues]
+        [identifies root cause: missing null check]
+        [offers to fix with TDD]
+
+        "Want me to fix this now?"
+
+You:    "yes"
+Claude: [writes test_get_profile_returns_404_for_missing_user]
+        [adds null check, test passes]
+        [LEARNING] get_user() returns None for missing users -- always check
+```
+
+**The difference:** You screenshot the error and paste the path. Claude reads the image, traces the problem through your codebase, diagnoses the root cause, and offers to fix it with a test. What took 20 minutes of manual debugging becomes a 30-second conversation.
+
 ---
 
 ## Orient -- Understand What You Have
@@ -490,6 +526,53 @@ Enforces the cycle:
 1. **RED** -- Write failing tests (happy path + edge cases + errors)
 2. **GREEN** -- Minimum code to pass ALL tests
 3. **REFACTOR** -- Clean up while keeping tests green
+
+### `/diagnose`
+
+**When to use:** You have an error screenshot, log file, or stack trace and need to understand what went wrong.
+
+```
+/diagnose ~/Desktop/Screenshot 2026-02-25.png
+/diagnose latest screenshot
+/diagnose ~/logs/app.log
+/diagnose TypeError: cannot unpack non-iterable NoneType object
+```
+
+Accepts any input: screenshots (PNG, JPG), log files, or pasted error text. Reads images visually, extracts error patterns, searches your codebase for affected code, diagnoses the root cause, and offers to fix it with TDD.
+
+**Example input:**
+```
+/diagnose ~/Desktop/Screenshot 2026-02-25.png
+```
+
+**Example output:**
+```
+## Diagnosis
+
+Issue type:  Runtime exception
+Severity:    High
+Root cause:  NoneType returned from get_user() when user doesn't exist
+
+### What I see
+Screenshot shows a Python traceback in terminal:
+  File "src/api/users.py", line 47, in get_profile
+    name, email = get_user(user_id)
+  TypeError: cannot unpack non-iterable NoneType object
+
+### Affected code
+- src/api/users.py:47 -- unpacks get_user() without null check
+- src/db/queries.py:23 -- get_user() returns None for missing users
+
+### Root cause analysis
+get_user() returns None when the user ID doesn't exist in the database,
+but get_profile() assumes it always returns a tuple and tries to unpack.
+The missing null check causes a TypeError instead of a proper 404.
+
+### Recommended fix
+Add a null check after get_user() call, return 404 if user not found.
+
+Want me to fix this now? (I'll write a failing test first)
+```
 
 ### `/verify`
 
