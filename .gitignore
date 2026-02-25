@@ -1,7 +1,7 @@
 __pycache__/
 *.pyc
 .venv/
-*.db
+*.db            # sqlite databases; backup workflow repos need their own .gitignore without this
 .pytest_cache/
 .env
 .env.*

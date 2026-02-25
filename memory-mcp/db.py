@@ -294,11 +294,15 @@ class MemoryDB:
         sort_order: str = "desc",
     ) -> list[dict]:
         """List memories with optional filters."""
-        allowed_sort = {"updated_at", "created_at", "importance", "access_count"}
-        if sort_by not in allowed_sort:
-            sort_by = "updated_at"
-        if sort_order not in ("asc", "desc"):
-            sort_order = "desc"
+        SORT_MAP = {
+            "updated_at": "updated_at",
+            "created_at": "created_at",
+            "importance": "importance",
+            "access_count": "access_count",
+        }
+        ORDER_MAP = {"asc": "ASC", "desc": "DESC"}
+        safe_sort = SORT_MAP.get(sort_by, "updated_at")
+        safe_order = ORDER_MAP.get(sort_order, "DESC")
 
         conditions = []
         params = []
@@ -313,7 +317,7 @@ class MemoryDB:
         query = f"""
             SELECT id, content, summary, category, project, tags, importance, access_count, updated_at
             FROM memories {where}
-            ORDER BY {sort_by} {sort_order}
+            ORDER BY {safe_sort} {safe_order}
             LIMIT ? OFFSET ?
         """
         params.extend([limit, offset])

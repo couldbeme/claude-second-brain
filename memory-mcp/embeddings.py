@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import logging
+import os
 from typing import Optional
 
 import httpx
@@ -12,6 +13,8 @@ logger = logging.getLogger(__name__)
 DEFAULT_LMS_URL = "http://localhost:1234/v1/embeddings"
 DEFAULT_MODEL = "text-embedding-nomic-embed-text-v1.5"
 EMBEDDING_DIM = 768
+
+_SAFE_URL_PREFIXES = ("http://localhost", "http://127.0.0.1")
 
 
 class EmbeddingClient:
@@ -28,6 +31,14 @@ class EmbeddingClient:
         self.timeout = timeout
         self._available: Optional[bool] = None
 
+        if not any(url.startswith(prefix) for prefix in _SAFE_URL_PREFIXES):
+            logger.warning(
+                "Embedding URL %r is not a localhost address -- remote URL may "
+                "exfiltrate text to an untrusted server. Set LMS_EMBEDDING_URL "
+                "to a localhost address to silence this warning.",
+                url,
+            )
+
     async def is_available(self) -> bool:
         """Check if the embedding service is reachable."""
         try:
@@ -40,11 +51,17 @@ class EmbeddingClient:
 
     async def embed(self, text: str) -> Optional[list[float]]:
         """Generate an embedding for the given text. Returns None if service unavailable."""
+        headers: dict[str, str] = {}
+        api_key = os.environ.get("LMS_EMBEDDING_API_KEY")
+        if api_key:
+            headers["Authorization"] = f"Bearer {api_key}"
+
         try:
             async with httpx.AsyncClient(timeout=self.timeout) as client:
                 resp = await client.post(
                     self.url,
                     json={"input": text, "model": self.model},
+                    headers=headers,
                 )
                 resp.raise_for_status()
                 data = resp.json()

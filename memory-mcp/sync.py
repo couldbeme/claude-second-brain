@@ -208,6 +208,10 @@ def scheduled_backup(
     Unlike scheduled_export (JSON), this commits the full SQLite DB —
     text, embeddings, FTS index — everything in one file.
 
+    IMPORTANT: The target repo MUST be private. The database may contain
+    PII, session context, or code snippets with credentials. Never push
+    to a public repository. Audit stored memories before enabling backup.
+
     Returns a summary dict: {committed, pushed, error}.
     Never raises — all errors are caught and returned in the dict.
     """

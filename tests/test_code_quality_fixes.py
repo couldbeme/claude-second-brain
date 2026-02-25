@@ -451,3 +451,123 @@ class TestImportMemoriesJsonError:
             )
 
         mock_db.save.assert_called_once()
+
+
+# ===========================================================================
+# Fix 6: list_memories sort safety -- replace fragile if-guard with dict maps
+# ===========================================================================
+
+class TestListMemoriesSortSafety:
+    """list_memories must use explicit dict-lookup maps for sort_by and sort_order.
+
+    The old pattern (if-guard + f-string interpolation) is fragile: a future
+    dev could skip the guard and expose a SQL injection surface.  The fix uses
+    SORT_MAP / ORDER_MAP so invalid values always fall back to safe defaults,
+    regardless of any surrounding guard code.
+    """
+
+    # ------------------------------------------------------------------
+    # Helpers
+    # ------------------------------------------------------------------
+
+    def _make_db(self):
+        """Return a MemoryDB instance with a mock connection (no __init__)."""
+        import db as db_module
+
+        mem_db = object.__new__(db_module.MemoryDB)
+        mock_conn = MagicMock()
+        # Default: execute returns a cursor whose fetchall returns []
+        mock_conn.execute.return_value.fetchall.return_value = []
+        mem_db.conn = mock_conn
+        return mem_db, mock_conn
+
+    def _captured_sql(self, mock_conn) -> str:
+        """Return the SQL string passed to the most recent conn.execute call."""
+        call_args = mock_conn.execute.call_args
+        assert call_args is not None, "conn.execute was never called"
+        return call_args[0][0]  # first positional arg (the SQL string)
+
+    # ------------------------------------------------------------------
+    # 1. Valid sort_by values must appear verbatim in the query
+    # ------------------------------------------------------------------
+
+    @pytest.mark.parametrize("col", ["updated_at", "created_at", "importance", "access_count"])
+    def test_valid_sort_by_appears_in_sql(self, col):
+        """Each allowed sort_by column name ends up in the ORDER BY clause."""
+        mem_db, mock_conn = self._make_db()
+        mem_db.list_memories(sort_by=col, sort_order="desc")
+        sql = self._captured_sql(mock_conn)
+        assert col in sql, (
+            f"Expected '{col}' in ORDER BY clause, got: {sql!r}"
+        )
+
+    # ------------------------------------------------------------------
+    # 2. Invalid sort_by falls back to "updated_at"
+    # ------------------------------------------------------------------
+
+    def test_invalid_sort_by_falls_back_to_updated_at(self):
+        """An unrecognised sort_by value must produce 'updated_at' in the query."""
+        mem_db, mock_conn = self._make_db()
+        mem_db.list_memories(sort_by="nonexistent_column", sort_order="desc")
+        sql = self._captured_sql(mock_conn)
+        assert "updated_at" in sql, (
+            f"Invalid sort_by should fall back to 'updated_at'. SQL: {sql!r}"
+        )
+
+    # ------------------------------------------------------------------
+    # 3. Invalid sort_order falls back to "DESC"
+    # ------------------------------------------------------------------
+
+    def test_invalid_sort_order_falls_back_to_desc(self):
+        """An unrecognised sort_order value must produce 'DESC' in the query."""
+        mem_db, mock_conn = self._make_db()
+        mem_db.list_memories(sort_by="updated_at", sort_order="sideways")
+        sql = self._captured_sql(mock_conn)
+        assert "DESC" in sql.upper(), (
+            f"Invalid sort_order should fall back to 'DESC'. SQL: {sql!r}"
+        )
+
+    # ------------------------------------------------------------------
+    # 4. SQL injection attempt in sort_by is neutralised
+    # ------------------------------------------------------------------
+
+    def test_sql_injection_in_sort_by_is_neutralised(self):
+        """Injection payload in sort_by must NOT appear in the executed SQL."""
+        injection = "updated_at; DROP TABLE memories"
+        mem_db, mock_conn = self._make_db()
+        mem_db.list_memories(sort_by=injection, sort_order="desc")
+        sql = self._captured_sql(mock_conn)
+        assert "DROP" not in sql, (
+            f"SQL injection payload leaked into query: {sql!r}"
+        )
+        # Falls back to the safe default instead
+        assert "updated_at" in sql, (
+            f"Injection sort_by should fall back to 'updated_at'. SQL: {sql!r}"
+        )
+
+    # ------------------------------------------------------------------
+    # 5. Verify implementation uses dict maps (source inspection)
+    # ------------------------------------------------------------------
+
+    def test_implementation_uses_sort_map_dict(self):
+        """Source of list_memories must define SORT_MAP as a dict, not an if-guard set."""
+        import inspect
+        import db as db_module
+
+        source = inspect.getsource(db_module.MemoryDB.list_memories)
+        assert "SORT_MAP" in source, (
+            "list_memories must use a SORT_MAP dict, not an allowlist set + if-guard"
+        )
+        assert "ORDER_MAP" in source, (
+            "list_memories must use an ORDER_MAP dict, not a bare if-guard"
+        )
+
+    def test_implementation_does_not_use_fragile_if_guard(self):
+        """Source must NOT use the old `if sort_by not in allowed_sort` pattern."""
+        import inspect
+        import db as db_module
+
+        source = inspect.getsource(db_module.MemoryDB.list_memories)
+        assert "allowed_sort" not in source, (
+            "list_memories still uses the old `allowed_sort` set -- replace with SORT_MAP"
+        )
