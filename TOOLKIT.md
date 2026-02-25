@@ -1559,11 +1559,9 @@ A `CLAUDE.md.template` is included in this repo as a starting point for your glo
 
 ## How Self-Learning Works
 
-The toolkit includes a self-learning system that captures knowledge automatically as you work -- not just when you explicitly call `/learn`.
+The toolkit includes a five-layer learning system that captures knowledge automatically as you work, detects subtle correction signals you might not even realize you're giving, and silently builds a behavioral profile to improve interaction quality over time.
 
-### Three layers of learning
-
-**Layer 1: Automatic tagging (during work)**
+### Layer 1: Automatic tagging (during work)
 
 When Claude discovers something non-obvious -- a gotcha, a failed approach, a working pattern -- it tags it with `[LEARNING]` inline in its response. You'll see these appear naturally:
 
@@ -1574,7 +1572,47 @@ When Claude discovers something non-obvious -- a gotcha, a failed approach, a wo
 
 These tags are saved immediately to your project's auto-memory directory so they persist across sessions. Claude creates topic files as needed (e.g., `debugging.md`, `patterns.md`).
 
-**Layer 2: Explicit capture (`/learn`)**
+### Layer 2: Correction pattern detection
+
+Claude doesn't just learn from explicit "that's wrong" corrections. It detects subtle conversational signals that indicate something must be learned:
+
+**Rhetorical questions** -- when you ask "why did you...?" or "why is there no...?", you're not asking a question, you're pointing out a mistake. Claude recognizes this and learns from it.
+
+**Past-behavior references** -- "previously you just did it without asking" or "before you used Redis" means the past behavior was correct and current behavior is wrong. Claude learns the delta.
+
+**Emphasis and repetition** -- ALL CAPS, repeated letters ("REEEAAALLY"), or the same correction given twice all signal importance escalation. A repeated correction is treated as critical (importance 9+) because it means a previous learning was missed.
+
+**Example -- rhetorical question as correction:**
+
+```
+You:    [Claude responds with verbose explanation]
+You:    "why is there no code in your response?"
+Claude: [LEARNING] User prefers code-first responses for implementation tasks.
+        Rhetorical question detected -- not asking why, pointing out what's missing.
+```
+
+**Example -- past-behavior reference:**
+
+```
+You:    "but previously you just did it without asking"
+Claude: [LEARNING] For simple file operations, execute directly instead of asking
+        for confirmation. Past behavior was correct.
+```
+
+### Layer 3: User model (silent adaptation)
+
+Over time, Claude builds a behavioral profile and adapts how it communicates -- without changing what it delivers:
+
+- **Matches your communication style** -- formality level, message length, structure preference
+- **Leads with big-picture or details** depending on your cognitive style
+- **Offers 1 option or 3 with trade-offs** depending on your decision pattern
+- **Detects frustration early** and adjusts (shorter, calmer, result-first)
+
+This happens automatically -- no commands needed. The model is stored locally in your memory database and loaded at each session start.
+
+**Critical safety: the quality floor.** The user model adapts *style* (how Claude communicates), never *substance* (what Claude delivers). Code correctness, security practices, TDD discipline, and honest assessment have hard floors that never move. Claude will simplify language but never simplify truth. If adapting would mean agreeing with something wrong, Claude breaks style and flags the concern directly.
+
+### Layer 4: Explicit capture (`/learn`)
 
 Run `/learn` to capture a specific learning or scan the whole session:
 
@@ -1583,22 +1621,16 @@ Run `/learn` to capture a specific learning or scan the whole session:
 /learn from session
 ```
 
-This classifies the learning (project-specific, global, tool-usage, pattern), deduplicates against existing knowledge, and proposes additions as diffs to your CLAUDE.md files. It also persists to the searchable knowledge base via the memory MCP server.
+The "from session" mode now does three scans:
+1. **Tagged learnings** -- finds all `[LEARNING]` tags
+2. **Missed corrections** -- detects rhetorical questions, past-behavior references, and repeated corrections that weren't tagged during the session
+3. **User model observations** -- captures communication style shifts, decision patterns, and frustration/satisfaction events
 
-**Layer 3: Searchable memory (memory MCP server)**
+Output includes a structured report grouping findings by type.
 
-The memory system (see [SETUP-MEMORY.md](SETUP-MEMORY.md)) embeds learnings as 768-dimensional vectors and stores them in a local SQLite database. This powers `/recall` with semantic search -- you can find relevant context even when you don't remember the exact words.
+### Layer 5: Searchable memory (memory MCP server)
 
-### What triggers automatic learning
-
-The `CLAUDE.md.template` instructs Claude to capture these automatically:
-
-- **You correct Claude's approach** ("that's wrong", "don't do it that way", "use X instead")
-- An approach was tried and found to be a bad fit
-- A test failed for a non-obvious reason
-- A dependency was missing that wasn't in requirements
-- A command or path in CLAUDE.md was wrong or outdated
-- A pattern worked well and should be reused
+The memory system (see [SETUP-MEMORY.md](SETUP-MEMORY.md)) embeds learnings as 768-dimensional vectors and stores them in a local SQLite database. This powers `/recall` with semantic search -- you can find relevant context even when you don't remember the exact words. User model observations are stored with `category="user_model"` and loaded automatically at session start.
 
 ### Example: learning from a correction
 
@@ -1625,13 +1657,15 @@ This is the key behavior: **Claude doesn't just fix the immediate problem -- it 
 ### The knowledge grows over time
 
 ```
-Session 1:  /new-project → empty CLAUDE.md
+Session 1:  /new-project → empty CLAUDE.md, blank user model
 Session 5:  CLAUDE.md has commands, architecture, 3 gotchas
+            User model: knows you prefer bullets, big-picture-first, quick decisions
 Session 20: CLAUDE.md is a rich project guide, memory DB has 50+ learnings
-            Claude starts each session already knowing the project deeply
+            User model: adapts tone, depth, structure to your exact style
+            Claude starts each session already knowing the project AND you
 ```
 
-The more you work with the toolkit, the less context you need to provide. Claude remembers what worked, what didn't, and why.
+The more you work with the toolkit, the less context you need to provide. Claude remembers what worked, what didn't, why, and how you prefer to work.
 
 ---
 

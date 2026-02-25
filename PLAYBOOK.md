@@ -283,3 +283,21 @@ Before long tasks, save context explicitly:
 ```
 
 If context gets compressed mid-session, Claude auto-recovers via `memory_context`. If something seems off, run `/recall [current task]` manually.
+
+### User Model Patterns
+
+The toolkit silently builds a behavioral profile across sessions. To get the most from it:
+
+- **Be yourself** -- the model learns from your natural communication style
+- **Correct consistently** -- if you always prefer tables over bullets, correct it once and it sticks
+- **Run `/learn from session`** regularly -- triggers a full scan including missed corrections and user model updates
+- **Don't worry about it** -- the model works in the background, no action needed from you
+- **Trust the quality floor** -- Claude adapts how it talks to you, never what it delivers. Code quality, security, TDD, and honest assessment never degrade regardless of the user model
+
+### End-of-Session Habit
+
+```
+/learn from session                 # captures everything: learnings + corrections + model updates
+```
+
+This single command catches what was missed during the session -- untagged corrections, preference signals, communication patterns. Run it before you close out.
