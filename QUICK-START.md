@@ -146,6 +146,43 @@ See [examples/sandbox/README.md](examples/sandbox/README.md) for a full step-by-
 
 ---
 
+## Create Your Own Command
+
+Found yourself repeating the same workflow? Turn it into a slash command with `/metaprompt`:
+
+```
+/metaprompt Create a command that adds a new API endpoint with route,
+            schema, handler, tests, and docs
+
+Claude: Generated command:
+
+        ---
+        description: Scaffold a new API endpoint with full test coverage
+        argument-hint: <resource-name> <methods>
+        ---
+
+        # New Endpoint
+
+        Phase 1: Create route in routes/$ARGUMENTS...
+        Phase 2: Add Pydantic schema...
+        Phase 3: Write handler...
+        Phase 4: Add tests (happy path + 404 + validation)...
+        Phase 5: Update API docs...
+
+        Save as command? [yes]
+
+        Saved to: .claude/commands/new-endpoint.md
+```
+
+Now anyone on the team can run:
+```
+/new-endpoint products GET,POST,DELETE
+```
+
+That's how the toolkit grows itself -- `/metaprompt` is the command that creates commands.
+
+---
+
 ## What's Next
 
 - `/guide [what you want to do]` -- get workflow advice anytime

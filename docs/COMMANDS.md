@@ -347,4 +347,31 @@ Each phase is mapped to the right tools. Every risk is anticipated. Agents execu
 - **Use immediately** -- run the generated prompt right now for better results
 - **Save as command** -- `.claude/commands/your-command.md` for the whole team
 
+**Example: creating a reusable command**
+
+```
+/metaprompt Create a command that adds a new API endpoint with route,
+            schema, handler, tests, and docs
+
+Claude: Generated command:
+
+        ---
+        description: Scaffold a new API endpoint with full test coverage
+        argument-hint: <resource-name> <methods>
+        ---
+
+        # New Endpoint
+        Phase 1: Create route in routes/$ARGUMENTS...
+        Phase 2: Add Pydantic schema...
+        Phase 3: Write handler...
+        Phase 4: Add tests (happy path + 404 + validation)...
+        Phase 5: Update API docs...
+
+        Save as command? [yes]
+        Saved to: .claude/commands/new-endpoint.md
+
+Next time:
+/new-endpoint products GET,POST,DELETE
+```
+
 This is the **command that creates commands** -- how the toolkit grows itself.
