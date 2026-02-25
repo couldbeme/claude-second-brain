@@ -13,10 +13,12 @@ cd claude-code-team-toolkit
 cp -r commands/ ~/.claude/commands/
 cp -r agents/ ~/.claude/agents/
 
-# 3. Optional: install global rules
+# 3. Install global rules
 cp CLAUDE.md.template ~/.claude/CLAUDE.md
 
-# 4. Open Claude Code in any project and try:
+# 4. Set up the memory system (see SETUP-MEMORY.md)
+
+# 5. Open Claude Code in any project and try:
 #    /status
 #    /explain src/
 #    /tdd Add input validation
@@ -39,7 +41,7 @@ For project-scoped install, copy into `your-project/.claude/` instead.
 | `/new-project` | Scaffold a project with CLAUDE.md template |
 | `/learn` | Capture learnings into CLAUDE.md |
 | `/recall` | Search project knowledge (CLAUDE.md, docs, code) |
-| `/audit` | Full 5-dimension codebase audit with scorecard |
+| `/audit` | Full 6-dimension codebase audit with scorecard |
 | `/gap-analysis` | Find missing tests, docs, error handling, types |
 | `/research` | Deep 3-track technical research with sources |
 | `/orchestrate` | Multi-agent task decomposition and execution |
@@ -58,12 +60,12 @@ For project-scoped install, copy into `your-project/.claude/` instead.
 | **research-agent** | Multi-source technical investigation |
 | **verification-agent** | Sequential test/lint/build pipeline |
 
-### Memory System (optional)
+### Memory System
 
 Persistent knowledge base that lets Claude Code remember across sessions. Uses local embeddings (LM Studio + nomic-embed-text) and hybrid search (70% semantic + 30% keyword).
 
-- **Works without LM Studio** -- falls back to keyword-only search
-- **See [SETUP-MEMORY.md](SETUP-MEMORY.md)** for full installation guide
+- **LM Studio is optional** -- without it, search falls back to keyword-only (the memory system itself is required)
+- **See [SETUP-MEMORY.md](SETUP-MEMORY.md)** for installation guide
 
 ### Other Files
 
@@ -72,6 +74,7 @@ Persistent knowledge base that lets Claude Code remember across sessions. Uses l
 | `TOOLKIT.md` | Full guide with examples -- **read this for the presentation** |
 | `CLAUDE.md.template` | Global rules template (TDD, security, communication style) |
 | `SETUP-MEMORY.md` | Step-by-step memory system installation guide |
+| `PLAYBOOK.md` | Practical recipes, prompt patterns, and agent composition strategies |
 | `memory-mcp/` | MCP server source code + requirements.txt + settings template |
 
 ## How It Works

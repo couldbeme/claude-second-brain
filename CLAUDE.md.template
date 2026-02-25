@@ -7,6 +7,8 @@
 3. **Token efficiency.** Batch tool calls. Read files speculatively in parallel. Use Glob/Grep before reading entire files. Avoid re-reading files already in context. Prefer targeted line ranges for large files.
 4. **No invented errors.** Before claiming a dependency is missing or a file does not exist, verify with Glob or Read. Check imports, installed packages, and actual error output. Never hallucinate stack traces.
 5. **Verify before asserting.** Run tests, linters, or builds to confirm fixes work. Do not claim "this should fix it" -- prove it does.
+6. **Context-first.** Before starting any task, check existing project knowledge: CLAUDE.md, memory (`/recall`), recent audit reports, gap analyses, and documentation. Never redo work that's already been done. If a previous audit, refactoring, or analysis exists, build on it -- don't repeat it. This is especially important when onboarding to a project another teammate has already been working on.
+7. **No mocks as deliverables.** Never use mocks, stubs, or fake implementations and present them as working solutions. If something must be mocked (e.g., external service unavailable, hardware dependency), state it explicitly and get user approval before proceeding. Every mock left in place must be flagged in the summary with a clear `[MOCKED]` tag explaining what it replaces and what's needed to make it real. The default is always: build the real thing.
 
 ## Communication Style
 
@@ -21,6 +23,7 @@
 - **Plan first.** For non-trivial tasks, use plan mode or present an approach before coding.
 - **Git discipline.** Atomic commits. Conventional commit messages. Never push to main without PR.
 - **Python conventions.** Use Ruff for linting, type hints on public interfaces.
+- **Check before building.** Run `/recall [task topic]` and read CLAUDE.md before writing any code. Previous sessions may have already solved your problem, identified constraints, or documented gotchas.
 - **When unsure, ask.** One clear question is better than a wrong assumption.
 
 ## Agent Orchestration Principles
@@ -37,7 +40,7 @@ When you discover something non-obvious about a project (gotcha, working command
 - Note it in your response with a `[LEARNING]` tag.
 - **Immediately** write the learning to the project's auto-memory directory (create topic files as needed, e.g., `debugging.md`, `patterns.md`). Do not wait for session end.
 - At session end or on `/learn`, also propose additions to the relevant CLAUDE.md.
-- If memory MCP is available, use `memory_save` with appropriate category, tags, and importance.
+- Use `memory_save` with appropriate category, tags, and importance.
 - Keep additions to one line per concept. Dense over verbose.
 
 **Auto-capture triggers -- always save these immediately:**

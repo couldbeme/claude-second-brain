@@ -1,6 +1,6 @@
 # Memory System Setup Guide
 
-The memory system gives Claude Code persistent knowledge across sessions. It stores learnings, decisions, patterns, and context in a local SQLite database with hybrid search (semantic vectors + keyword matching).
+The memory system is a core component of the toolkit. It gives Claude Code persistent knowledge across sessions, storing learnings, decisions, patterns, and context in a local SQLite database with hybrid search (semantic vectors + keyword matching).
 
 ## System Requirements
 
@@ -12,7 +12,7 @@ The memory system gives Claude Code persistent knowledge across sessions. It sto
 | RAM | ~2GB extra | When LM Studio is running the embedding model |
 | OS | macOS, Linux | Windows: untested but should work via WSL |
 
-**Without LM Studio:** Everything still works -- search falls back to keyword-only (BM25). You lose semantic similarity but keep full functionality.
+**LM Studio is optional.** Without it, search falls back to keyword-only (BM25). You lose semantic similarity but the memory system remains fully functional. The memory system itself is required -- it powers `/learn`, `/recall`, self-learning, and context recovery.
 
 ## Setup Steps
 
@@ -167,10 +167,65 @@ memory_search("how do we handle rate limits?")
 - Check the path exists: `ls ~/.claude/memory/memory.db`
 - The DB is created automatically on first save
 
+## Automated Sync
+
+The memory system supports automated periodic exports that commit to git. This ensures your knowledge base is backed up and available across machines without manual intervention.
+
+### Quick Setup (cron)
+
+```bash
+# Export every hour, auto-commit to git
+crontab -e
+# Add this line:
+0 * * * * /path/to/.venv/bin/python3 /path/to/memory-mcp/sync.py scheduled 2>&1 >> ~/.claude/memory/sync.log
+```
+
+### macOS Setup (launchd) -- recommended
+
+```bash
+# 1. Copy the template
+cp memory-mcp/com.claude.sync-memories.plist.template \
+   ~/Library/LaunchAgents/com.claude.sync-memories.plist
+
+# 2. Edit and replace REPLACE_WITH_* placeholders with actual paths
+
+# 3. Load it
+launchctl load ~/Library/LaunchAgents/com.claude.sync-memories.plist
+
+# 4. Verify
+launchctl list | grep claude
+```
+
+### How it works
+
+1. Exports all memories to `~/.claude/memory/memories-export.json`
+2. Runs `git add` on the export file
+3. If there are changes, commits with a timestamped message
+4. With `--push` flag, also pushes to remote after commit
+5. Safe for cron/launchd: errors are logged, never crash
+
+### Commands
+
+```bash
+python sync.py scheduled           # export + git commit
+python sync.py scheduled --push    # export + git commit + push
+```
+
+### Verify it works
+
+```bash
+# Manual test
+cd /path/to/memory-mcp && python sync.py scheduled
+# Check the log
+cat ~/.claude/memory/sync.log
+# Check git log
+git log --oneline -3
+```
+
 ## Recommended Workflow
 
 1. **Start LM Studio** at the beginning of your work session (or set it to auto-start)
 2. **Use `/learn`** after discoveries: `[LEARNING]` tags get saved automatically
 3. **Use `/recall`** before starting work on something familiar
-4. **Use `/sync-memories export`** periodically to back up
+4. **Set up automated sync** (see above) -- no more manual exports
 5. If LM Studio isn't running, everything still works -- just without semantic search
