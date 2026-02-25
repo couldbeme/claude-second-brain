@@ -54,6 +54,110 @@ Follow [SETUP-MEMORY.md](SETUP-MEMORY.md) to install the memory MCP server. This
 
 ---
 
+## Your First 5 Minutes -- A Complete Walkthrough
+
+Here's exactly what happens when a new team member uses the toolkit for the first time. This is a real workflow, not a toy example.
+
+### Setup (one time, 30 seconds)
+
+```bash
+git clone <repo-url> claude-code-team-toolkit
+cp -r claude-code-team-toolkit/commands/ ~/.claude/commands/
+cp -r claude-code-team-toolkit/agents/ ~/.claude/agents/
+cp claude-code-team-toolkit/CLAUDE.md.template ~/.claude/CLAUDE.md
+```
+
+### Minute 1: Orient yourself
+
+Open Claude Code in any existing project and type:
+
+```
+/guide tour
+```
+
+Claude responds with a categorized overview of all 17 commands. You now know what's available.
+
+### Minute 2: Understand what you're working with
+
+```
+/status
+```
+
+```
+Project Status
+==============
+Branch: main (3 commits ahead of origin)
+Tests:  47 passed, 2 failed
+Lint:   Clean
+Next:   Fix failing tests in test_auth.py, then push
+```
+
+You instantly know where things stand -- no digging through git log or running commands manually.
+
+### Minute 3: Fix something with tests
+
+```
+/tdd Fix the failing tests in test_auth.py
+```
+
+Claude:
+1. Reads the failing tests to understand what's expected
+2. Reads the source code that's being tested
+3. Writes a fix that makes the tests pass
+4. Runs the full suite to verify nothing else broke
+
+```
+TDD Cycle Complete
+==================
+RED:      2 failing tests identified (test_login_expired_token, test_refresh_token)
+GREEN:    Fixed token expiry check in src/auth/tokens.py:34
+REFACTOR: Extracted validate_expiry() helper
+Tests:    49 passed, 0 failed
+```
+
+### Minute 4: Ship it
+
+```
+/verify
+```
+
+```
+Verification Report
+===================
+Dependencies:      PASS
+Lint:              PASS
+Tests:             PASS (49/49)
+Build:             PASS
+Git:               PASS (clean, 4 commits ahead)
+Overall:           HEALTHY ✓
+```
+
+```
+/commit-push-pr
+```
+
+Claude creates a branch, commits with a conventional message, pushes, and opens a PR -- all quality-gated (tests must pass first).
+
+### Minute 5: Save what you learned
+
+```
+/learn from session
+```
+
+Claude scans the session, finds what was discovered (the token expiry bug, the fix pattern), and saves it to project memory. Next time anyone works on auth, they'll find this knowledge via `/recall auth tokens`.
+
+### That's it
+
+Five commands. Five minutes. You went from "what is this project?" to "PR is open with tests passing." Every future session starts smarter because the toolkit remembers what you learned.
+
+**Next steps:**
+- Run `/guide [what you want to do]` anytime for workflow advice
+- Run `/explain [module]` before touching unfamiliar code
+- Run `/audit` for a full health check before releases
+- Read [PLAYBOOK.md](PLAYBOOK.md) for more recipes and patterns
+
+---
+
 ## Commands at a Glance
 
 | Command | What it does |
@@ -507,7 +611,7 @@ cause, not just the symptom.
 Want me to run `/recall auth bug` now?
 ```
 
-**Tour mode:** Run `/guide tour` to get a categorized overview of all 16 commands grouped by purpose (Orient, Build, Analyze, Research & Learn, Power Tools).
+**Tour mode:** Run `/guide tour` to get a categorized overview of all 17 commands grouped by purpose (Orient, Build, Analyze, Research & Learn, Power Tools).
 
 ---
 
