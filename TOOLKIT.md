@@ -1,6 +1,6 @@
 # Claude Code Team Toolkit
 
-### 15 Slash Commands + 7 Agents for High-Quality Development
+### 16 Slash Commands + 7 Agents for High-Quality Development
 
 Slash commands are reusable workflow prompts for Claude Code. Type `/command-name` and Claude follows a structured process instead of ad-hoc prompting. Agents are specialized subprocesses that handle focused tasks autonomously.
 
@@ -44,6 +44,7 @@ Follow [SETUP-MEMORY.md](SETUP-MEMORY.md) to install the memory MCP server. This
 ### 5. Start using commands
 
 ```
+/guide tour                       # new? start here -- see all commands
 /status                           # see where things stand
 /explain src/auth/                # understand unfamiliar code
 /tdd Add input validation         # build with tests first
@@ -66,12 +67,13 @@ Follow [SETUP-MEMORY.md](SETUP-MEMORY.md) to install the memory MCP server. This
 | `/new-project` | Scaffold project with CLAUDE.md template |
 | `/learn` | Capture learnings into CLAUDE.md |
 | `/recall` | Search project knowledge base |
-| `/audit` | Full 5-dimension codebase audit with scorecard |
+| `/audit` | Full 6-dimension codebase audit with scorecard |
 | `/gap-analysis` | Find missing tests, docs, error handling, types |
 | `/research` | Deep 3-track technical research with sources |
 | `/orchestrate` | Decompose complex tasks into multi-agent workflows |
 | `/metaprompt` | Generate optimized slash commands from a task description |
 | `/sync-memories` | Export/import knowledge between machines |
+| `/guide` | Interactive toolkit assistant -- suggests commands and workflows |
 
 ---
 
@@ -435,6 +437,41 @@ Produces three depth levels:
 ```
 
 Searches CLAUDE.md files, README, docs/, code, and test files. Synthesizes results by source.
+
+### `/guide`
+
+**When to use:** You're new to the toolkit and don't know which command to reach for. Or you want a recommended workflow for your current task.
+
+```
+/guide I need to add a new API endpoint
+/guide I'm new to this codebase
+/guide tour
+```
+
+Classifies your intent (orient, build, analyze, ship, research, knowledge, meta) and suggests a step-by-step workflow with the exact commands to run and WHY each step matters.
+
+**Example input:**
+```
+/guide I need to fix a bug in the auth module
+```
+
+**Example output:**
+```
+For fixing a bug, here's the recommended workflow:
+
+1. /recall auth bug              — check if this was seen before
+2. /explain src/auth/            — understand the module before touching it
+3. /tdd Fix [the bug]            — test-first fix (proves the fix works)
+4. /learn [root cause]           — save what caused it to prevent recurrence
+
+Why this order: The most common mistake is jumping straight to fixing.
+Checking history and understanding context first means you fix the root
+cause, not just the symptom.
+
+Want me to run `/recall auth bug` now?
+```
+
+**Tour mode:** Run `/guide tour` to get a categorized overview of all 16 commands grouped by purpose (Orient, Build, Analyze, Research & Learn, Power Tools).
 
 ---
 

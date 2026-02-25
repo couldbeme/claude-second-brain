@@ -2,6 +2,8 @@
 
 Recipes, prompt patterns, and agent composition strategies for common development tasks. This is a living document -- add your own patterns as you discover them.
 
+**New to the toolkit?** Start with `/guide tour` for a quick overview, or `/guide [what you want to do]` to get a recommended workflow.
+
 ---
 
 ## Daily Workflow Patterns
