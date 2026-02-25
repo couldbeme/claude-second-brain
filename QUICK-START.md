@@ -47,7 +47,7 @@ Open Claude Code in any existing project and type:
 /guide tour
 ```
 
-Claude responds with a categorized overview of all 20 commands. You now know what's available.
+Claude responds with a categorized overview of all 21 commands. You now know what's available.
 
 ### Minute 2: Understand what you're working with
 
@@ -190,4 +190,4 @@ That's how the toolkit grows itself -- `/metaprompt` is the command that creates
 - `/audit` -- full health check before releases
 - [TOOLKIT.md](TOOLKIT.md) -- the full guide with 9 Before & After scenarios
 - [PLAYBOOK.md](PLAYBOOK.md) -- daily workflow recipes and prompt patterns
-- [docs/COMMANDS.md](docs/COMMANDS.md) -- detailed reference for all 20 commands
+- [docs/COMMANDS.md](docs/COMMANDS.md) -- detailed reference for all 21 commands
