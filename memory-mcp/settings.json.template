@@ -1,0 +1,14 @@
+{
+  "mcpServers": {
+    "memory": {
+      "type": "stdio",
+      "command": "REPLACE_WITH_VENV_PATH/.venv/bin/python3",
+      "args": ["REPLACE_WITH_MEMORY_MCP_PATH/server.py"],
+      "env": {
+        "MEMORY_DB_GLOBAL": "REPLACE_WITH_HOME/.claude/memory/memory.db",
+        "LMS_EMBEDDING_URL": "http://localhost:1234/v1/embeddings",
+        "LMS_EMBEDDING_MODEL": "text-embedding-nomic-embed-text-v1.5"
+      }
+    }
+  }
+}
