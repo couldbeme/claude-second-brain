@@ -3,3 +3,7 @@ __pycache__/
 .venv/
 *.db
 .pytest_cache/
+.env
+.env.*
+!.env.example
+memory/memories-export.json

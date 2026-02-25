@@ -1,6 +1,6 @@
 # Sandbox -- Hands-On Toolkit Practice
 
-A small Python app with **4 intentional issues** for you to find and fix using the toolkit.
+A small Python app with **5 intentional issues** for you to find and fix using the toolkit.
 
 ## The Issues
 
@@ -10,6 +10,7 @@ A small Python app with **4 intentional issues** for you to find and fix using t
 | 2 | Code quality | High | Error handling that hides problems |
 | 3 | Bug | High | What happens when data is missing? |
 | 4 | Coverage | Medium | How many tests exist? |
+| 5 | Security | Critical | Does login actually verify passwords? |
 
 ## Walkthrough
 

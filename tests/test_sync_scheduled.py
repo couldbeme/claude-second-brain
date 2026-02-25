@@ -1,14 +1,16 @@
-"""TDD tests for scheduled_export() in sync.py.
+"""TDD tests for scheduled_export() and reembed_missing() in sync.py.
 
-Tests the automated export + git commit functionality designed for cron/launchd.
+Tests the automated export + git commit functionality designed for cron/launchd,
+and the post-import re-embedding of memories that lack vector entries.
 """
 
+import asyncio
 import json
 import os
 import subprocess
 import tempfile
 from pathlib import Path
-from unittest.mock import MagicMock, patch, call
+from unittest.mock import AsyncMock, MagicMock, patch, call
 
 import pytest
 
@@ -22,7 +24,7 @@ sys.modules.setdefault("db", MagicMock())
 sys.modules.setdefault("hybrid_search", MagicMock())
 sys.modules.setdefault("embeddings", MagicMock())
 
-from sync import scheduled_export, export_memories
+from sync import scheduled_export, export_memories, reembed_missing
 
 
 @pytest.fixture
@@ -62,11 +64,10 @@ class TestScheduledExport:
 
         scheduled_export(db_path=tmp_db, export_path=tmp_export)
 
-        git_add_call = call(
-            ["git", "add", tmp_export],
-            capture_output=True, text=True, check=True
-        )
-        assert git_add_call in mock_run.call_args_list
+        # Find the git add call (first subprocess call)
+        git_add_call = mock_run.call_args_list[0]
+        assert git_add_call[0][0] == ["git", "add", tmp_export]
+        assert git_add_call[1]["check"] is True
 
     @patch("sync.export_memories")
     @patch("subprocess.run")
@@ -169,3 +170,132 @@ class TestScheduledExport:
         assert "committed" in result
         assert "pushed" in result
         assert "error" in result
+
+
+class TestReembedMissing:
+    """Tests for the reembed_missing() function."""
+
+    def test_embeds_memories_without_vectors(self, tmp_db):
+        """Memories with no vector entry get embedded."""
+        mock_db = MagicMock()
+        mock_db.conn.execute.return_value.fetchall.return_value = [
+            (1, "mem_aaa", "how to use pytest fixtures"),
+            (2, "mem_bbb", "rate limiting uses sliding window"),
+        ]
+
+        mock_embedder = MagicMock()
+        mock_embedder.embed = AsyncMock(return_value=[0.1] * 768)
+
+        result = asyncio.run(reembed_missing(mock_db, mock_embedder))
+
+        assert result["embedded"] == 2
+        assert result["failed"] == 0
+        assert mock_embedder.embed.call_count == 2
+        assert mock_db.update.call_count == 2
+
+    def test_skips_when_no_missing(self, tmp_db):
+        """No work when all memories already have vectors."""
+        mock_db = MagicMock()
+        mock_db.conn.execute.return_value.fetchall.return_value = []
+
+        mock_embedder = MagicMock()
+        mock_embedder.embed = AsyncMock()
+
+        result = asyncio.run(reembed_missing(mock_db, mock_embedder))
+
+        assert result["embedded"] == 0
+        assert result["failed"] == 0
+        mock_embedder.embed.assert_not_called()
+
+    def test_counts_failures_when_embedder_returns_none(self, tmp_db):
+        """If embedder returns None (service down), count as failed."""
+        mock_db = MagicMock()
+        mock_db.conn.execute.return_value.fetchall.return_value = [
+            (1, "mem_aaa", "some content"),
+        ]
+
+        mock_embedder = MagicMock()
+        mock_embedder.embed = AsyncMock(return_value=None)
+
+        result = asyncio.run(reembed_missing(mock_db, mock_embedder))
+
+        assert result["embedded"] == 0
+        assert result["failed"] == 1
+        mock_db.update.assert_not_called()
+
+    def test_queries_only_memories_without_vectors(self, tmp_db):
+        """SQL query must use LEFT JOIN ... WHERE IS NULL to find unembedded."""
+        mock_db = MagicMock()
+        mock_db.conn.execute.return_value.fetchall.return_value = []
+
+        mock_embedder = MagicMock()
+        mock_embedder.embed = AsyncMock()
+
+        asyncio.run(reembed_missing(mock_db, mock_embedder))
+
+        sql_call = mock_db.conn.execute.call_args[0][0]
+        assert "LEFT JOIN" in sql_call
+        assert "IS NULL" in sql_call
+
+
+class TestScheduledBackup:
+    """Tests for scheduled_backup() — commits memory.db directly to a private repo."""
+
+    @patch("subprocess.run")
+    def test_runs_git_add_on_db_file(self, mock_run):
+        """git add is called on the DB file."""
+        from sync import scheduled_backup
+        mock_run.side_effect = [
+            MagicMock(returncode=0),  # git add
+            MagicMock(returncode=1),  # git diff (has changes)
+            MagicMock(returncode=0),  # git commit
+        ]
+
+        scheduled_backup(db_path="/tmp/test.db", repo_dir="/tmp/repo")
+
+        git_add = mock_run.call_args_list[0]
+        assert git_add[0][0] == ["git", "add", "/tmp/test.db"]
+        assert git_add[1]["cwd"] == "/tmp/repo"
+
+    @patch("subprocess.run")
+    def test_commits_with_timestamp(self, mock_run):
+        """Commits with a sync: prefix and timestamp."""
+        from sync import scheduled_backup
+        mock_run.side_effect = [
+            MagicMock(returncode=0),  # git add
+            MagicMock(returncode=1),  # git diff (has changes)
+            MagicMock(returncode=0),  # git commit
+        ]
+
+        result = scheduled_backup(db_path="/tmp/test.db", repo_dir="/tmp/repo")
+
+        commit_call = mock_run.call_args_list[2]
+        cmd_args = commit_call[0][0]
+        assert cmd_args[0:2] == ["git", "commit"]
+        assert any("sync:" in arg for arg in cmd_args)
+        assert result["committed"] is True
+
+    @patch("subprocess.run")
+    def test_skips_commit_when_no_changes(self, mock_run):
+        """No commit when DB hasn't changed."""
+        from sync import scheduled_backup
+        mock_run.side_effect = [
+            MagicMock(returncode=0),  # git add
+            MagicMock(returncode=0),  # git diff --cached --quiet (no changes)
+        ]
+
+        result = scheduled_backup(db_path="/tmp/test.db", repo_dir="/tmp/repo")
+
+        assert result["committed"] is False
+        assert len(mock_run.call_args_list) == 2
+
+    @patch("subprocess.run")
+    def test_never_raises(self, mock_run):
+        """Errors are caught, not raised — safe for cron/launchd."""
+        from sync import scheduled_backup
+        mock_run.side_effect = subprocess.CalledProcessError(128, "git")
+
+        result = scheduled_backup(db_path="/tmp/test.db", repo_dir="/tmp/repo")
+
+        assert result["error"] is not None
+        assert result["committed"] is False

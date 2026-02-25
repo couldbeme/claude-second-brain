@@ -1,16 +1,20 @@
 """Export and import memories for syncing between machines.
 
 Usage:
+    python sync.py backup              # Commit memory.db to private git repo (recommended)
+    python sync.py backup --push       # Commit + push to remote
     python sync.py export              # Export all memories to JSON
     python sync.py import              # Import from JSON, merging with local
     python sync.py export --pretty     # Human-readable JSON
     python sync.py stats               # Show sync status
-    python sync.py scheduled           # Export + auto git commit (for cron/launchd)
-    python sync.py scheduled --push    # Export + git commit + push
+    python sync.py scheduled           # JSON export + auto git commit (legacy)
+    python sync.py scheduled --push    # JSON export + git commit + push
+    python sync.py reembed             # Re-embed memories missing vectors
 """
 
 from __future__ import annotations
 
+import asyncio
 import json
 import logging
 import os
@@ -21,8 +25,15 @@ from datetime import datetime
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from db import MemoryDB
 
-DEFAULT_EXPORT_PATH = os.path.expanduser("~/.claude/memory/memories-export.json")
-DEFAULT_DB_PATH = os.path.expanduser("~/.claude/memory/memory.db")
+DEFAULT_EXPORT_PATH = os.environ.get(
+    "SYNC_EXPORT_PATH",
+    os.path.expanduser("~/.claude/memory/memories-export.json"),
+)
+DEFAULT_DB_PATH = os.environ.get(
+    "SYNC_DB_PATH",
+    os.path.expanduser("~/.claude/memory/memory.db"),
+)
+DEFAULT_REPO_DIR = os.environ.get("SYNC_REPO_DIR", None)
 
 
 def export_memories(pretty: bool = False, db_path: str = DEFAULT_DB_PATH, export_path: str = DEFAULT_EXPORT_PATH) -> int:
@@ -58,7 +69,11 @@ def import_memories(db_path: str = DEFAULT_DB_PATH, export_path: str = DEFAULT_E
         sys.exit(1)
 
     with open(export_path) as f:
-        incoming = json.load(f)
+        try:
+            incoming = json.load(f)
+        except json.JSONDecodeError:
+            print("Export file is corrupted or incomplete. Try re-exporting.")
+            return
 
     db = MemoryDB(db_path)
 
@@ -139,17 +154,104 @@ def show_stats(db_path: str = DEFAULT_DB_PATH, export_path: str = DEFAULT_EXPORT
 log = logging.getLogger("sync")
 
 
+async def reembed_missing(db, embedder) -> dict:
+    """Re-embed memories that have no vector entry. Returns {embedded, failed}.
+
+    Finds memories in the DB that lack a corresponding row in memory_vectors
+    and generates embeddings for them. Safe to run repeatedly — only touches
+    memories without vectors, never overwrites existing ones.
+    """
+    result = {"embedded": 0, "failed": 0}
+
+    rows = db.conn.execute(
+        """SELECT m.rowid, m.id, m.content
+           FROM memories m
+           LEFT JOIN memory_vectors v ON m.rowid = v.rowid
+           WHERE v.rowid IS NULL"""
+    ).fetchall()
+
+    for rowid, mem_id, content in rows:
+        embedding = await embedder.embed(content)
+        if embedding is None:
+            result["failed"] += 1
+            continue
+        db.update(mem_id=mem_id, embedding=embedding)
+        result["embedded"] += 1
+
+    return result
+
+
+def scheduled_backup(
+    db_path: str = DEFAULT_DB_PATH,
+    repo_dir: str | None = None,
+    push: bool = False,
+) -> dict:
+    """Commit memory.db directly to a private git repo. Designed for cron/launchd.
+
+    Unlike scheduled_export (JSON), this commits the full SQLite DB —
+    text, embeddings, FTS index — everything in one file.
+
+    Returns a summary dict: {committed, pushed, error}.
+    Never raises — all errors are caught and returned in the dict.
+    """
+    result = {"committed": False, "pushed": False, "error": None}
+    git_cwd = repo_dir or os.path.dirname(db_path)
+
+    try:
+        # 1. Git add the DB file
+        subprocess.run(
+            ["git", "add", db_path],
+            capture_output=True, text=True, check=True, cwd=git_cwd,
+        )
+
+        # 2. Check if there are staged changes
+        diff_result = subprocess.run(
+            ["git", "diff", "--cached", "--quiet", db_path],
+            capture_output=True, text=True, cwd=git_cwd,
+        )
+        if diff_result.returncode == 0:
+            log.info("No changes to commit")
+            return result
+
+        # 3. Commit with timestamp
+        timestamp = datetime.now().strftime("%Y-%m-%d %H:%M")
+        subprocess.run(
+            ["git", "commit", "-m", f"sync: backup memory.db ({timestamp})"],
+            capture_output=True, text=True, check=True, cwd=git_cwd,
+        )
+        result["committed"] = True
+
+        # 4. Optional push
+        if push:
+            subprocess.run(
+                ["git", "push"],
+                capture_output=True, text=True, check=True, cwd=git_cwd,
+            )
+            result["pushed"] = True
+
+    except Exception as e:
+        log.error("Scheduled backup failed: %s", e)
+        result["error"] = str(e)
+
+    return result
+
+
 def scheduled_export(
     db_path: str = DEFAULT_DB_PATH,
     export_path: str = DEFAULT_EXPORT_PATH,
     push: bool = False,
+    repo_dir: str | None = None,
 ) -> dict:
     """Export memories and auto-commit to git. Designed for cron/launchd.
+
+    Args:
+        repo_dir: Git repo to commit into. Defaults to the directory of sync.py.
 
     Returns a summary dict: {exported, committed, pushed, error}.
     Never raises — all errors are caught and returned in the dict.
     """
     result = {"exported": 0, "committed": False, "pushed": False, "error": None}
+    git_cwd = repo_dir or os.path.dirname(os.path.abspath(__file__))
 
     try:
         # 1. Export
@@ -160,13 +262,13 @@ def scheduled_export(
         # 2. Git add
         subprocess.run(
             ["git", "add", export_path],
-            capture_output=True, text=True, check=True,
+            capture_output=True, text=True, check=True, cwd=git_cwd,
         )
 
         # 3. Check if there are staged changes
         diff_result = subprocess.run(
             ["git", "diff", "--cached", "--quiet", export_path],
-            capture_output=True, text=True,
+            capture_output=True, text=True, cwd=git_cwd,
         )
         if diff_result.returncode == 0:
             # No changes — nothing to commit
@@ -177,7 +279,7 @@ def scheduled_export(
         timestamp = datetime.now().strftime("%Y-%m-%d %H:%M")
         subprocess.run(
             ["git", "commit", "-m", f"sync: auto-export memories ({timestamp})"],
-            capture_output=True, text=True, check=True,
+            capture_output=True, text=True, check=True, cwd=git_cwd,
         )
         result["committed"] = True
 
@@ -185,7 +287,7 @@ def scheduled_export(
         if push:
             subprocess.run(
                 ["git", "push"],
-                capture_output=True, text=True, check=True,
+                capture_output=True, text=True, check=True, cwd=git_cwd,
             )
             result["pushed"] = True
 
@@ -209,11 +311,24 @@ def main():
     elif cmd == "stats":
         show_stats()
     elif cmd == "scheduled":
-        result = scheduled_export(push="--push" in sys.argv)
+        result = scheduled_export(push="--push" in sys.argv, repo_dir=DEFAULT_REPO_DIR)
         if result["error"]:
             print(f"Error: {result['error']}")
             sys.exit(1)
         print(f"Exported: {result['exported']}, Committed: {result['committed']}, Pushed: {result['pushed']}")
+    elif cmd == "backup":
+        result = scheduled_backup(push="--push" in sys.argv, repo_dir=DEFAULT_REPO_DIR)
+        if result["error"]:
+            print(f"Error: {result['error']}")
+            sys.exit(1)
+        print(f"Committed: {result['committed']}, Pushed: {result['pushed']}")
+    elif cmd == "reembed":
+        from embeddings import EmbeddingClient
+        db = MemoryDB(DEFAULT_DB_PATH)
+        embedder = EmbeddingClient()
+        result = asyncio.run(reembed_missing(db, embedder))
+        db.close()
+        print(f"Re-embedded: {result['embedded']}, Failed: {result['failed']}")
     else:
         print(f"Unknown command: {cmd}")
         print(__doc__)

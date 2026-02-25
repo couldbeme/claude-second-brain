@@ -1,5 +1,5 @@
 """
-Sandbox App -- A small Flask-style app with 4 intentional issues.
+Sandbox App -- A small Flask-style app with 5 intentional issues.
 
 Use this to practice toolkit commands:
   /scan       -- find all issues
@@ -12,13 +12,14 @@ Issues planted:
   2. Bare except swallowing errors (quality)
   3. Function returns None without null check downstream (bug)
   4. No tests at all (coverage gap)
+  5. Authentication bypass -- password never checked (security)
 """
 
 import hashlib
 import sqlite3
 
 # Issue 1: Hardcoded API key -- should be in environment variable
-API_KEY = "sk-prod-a1b2c3d4e5f6g7h8i9j0"
+API_KEY = "sk-EXAMPLE-not-a-real-key-replace-me"
 
 DB_PATH = "users.db"
 

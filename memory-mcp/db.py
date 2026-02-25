@@ -371,15 +371,18 @@ class MemoryDB:
         self, query_embedding: list[float], limit: int = 5
     ) -> list[dict]:
         """Search using vector similarity (L2 distance via sqlite-vec)."""
-        rows = self.conn.execute(
-            """SELECT v.rowid, v.distance, m.id, m.content, m.summary, m.category,
-                      m.project, m.tags, m.importance
-               FROM memory_vectors v
-               JOIN memories m ON v.rowid = m.rowid
-               WHERE v.embedding MATCH ?
-                 AND k = ?""",
-            (json.dumps(query_embedding), limit),
-        ).fetchall()
+        try:
+            rows = self.conn.execute(
+                """SELECT v.rowid, v.distance, m.id, m.content, m.summary, m.category,
+                          m.project, m.tags, m.importance
+                   FROM memory_vectors v
+                   JOIN memories m ON v.rowid = m.rowid
+                   WHERE v.embedding MATCH ?
+                     AND k = ?""",
+                (json.dumps(query_embedding), limit),
+            ).fetchall()
+        except sqlite3.OperationalError:
+            return []
 
         return [
             {
@@ -399,3 +402,11 @@ class MemoryDB:
     def close(self):
         """Close the database connection."""
         self.conn.close()
+
+    def __enter__(self) -> "MemoryDB":
+        """Support use as a context manager."""
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb) -> None:
+        """Close the database connection on context manager exit."""
+        self.close()

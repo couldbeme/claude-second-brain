@@ -74,7 +74,7 @@ cause, not just the symptom.
 Want me to run `/recall auth bug` now?
 ```
 
-**Tour mode:** Run `/guide tour` to get a categorized overview of all 18 commands grouped by purpose (Orient, Build, Analyze, Research & Learn, Power Tools).
+**Tour mode:** Run `/guide tour` to get a categorized overview of all 20 commands grouped by purpose (Orient, Build, Analyze, Research & Learn, Power Tools).
 
 ---
 

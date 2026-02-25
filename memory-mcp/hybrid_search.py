@@ -98,7 +98,7 @@ def hybrid_search(
         merged = [r for r in merged if r["project"] == project]
     if tags:
         merged = [r for r in merged if all(t in r["tags"] for t in tags)]
-    if min_importance:
+    if min_importance is not None:
         merged = [r for r in merged if r["importance"] >= min_importance]
 
     # Sort by combined score descending, take top N
