@@ -2,7 +2,7 @@
 
 18 slash commands + 7 specialized agents for [Claude Code](https://docs.anthropic.com/en/docs/claude-code) that enforce consistent, high-quality development workflows.
 
-**New here?** Jump to [Your First 5 Minutes](#your-first-5-minutes) for a hands-on walkthrough.
+**New here?** Jump to [QUICK-START.md](QUICK-START.md) for install + a hands-on walkthrough.
 
 ## Quick Start
 
@@ -33,14 +33,19 @@ For project-scoped install, copy into `your-project/.claude/` instead.
 
 | Doc | What it covers |
 |-----|----------------|
-| **[TOOLKIT.md](TOOLKIT.md)** | Complete guide — setup, 9 Before & After scenarios, every command and agent explained with examples |
-| **[PLAYBOOK.md](PLAYBOOK.md)** | Daily workflow recipes, prompt patterns, agent composition strategies, AI/LLM security patterns |
+| **[QUICK-START.md](QUICK-START.md)** | Install guide + "Your First 5 Minutes" walkthrough + hands-on sandbox |
+| **[TOOLKIT.md](TOOLKIT.md)** | Why the toolkit matters — 9 Before & After scenarios |
+| **[PLAYBOOK.md](PLAYBOOK.md)** | Daily workflow recipes, prompt patterns, agent composition, AI/LLM security |
+| **[docs/COMMANDS.md](docs/COMMANDS.md)** | Full reference for all 18 commands |
+| **[docs/AGENTS.md](docs/AGENTS.md)** | Full reference for all 7 agents |
+| **[docs/SELF-LEARNING.md](docs/SELF-LEARNING.md)** | CLAUDE.md workflow + 5-layer learning system |
+| **[docs/ADVANCED-PATTERNS.md](docs/ADVANCED-PATTERNS.md)** | Skills crystallization, context recovery, post-audit remediation |
 | **[SETUP-MEMORY.md](SETUP-MEMORY.md)** | Memory system installation — LM Studio, MCP server, hybrid search |
 | **[CLAUDE.md.template](CLAUDE.md.template)** | Global rules template — TDD, security, self-learning protocol |
-| **[docs/ROLLOUT-GUIDE.md](docs/ROLLOUT-GUIDE.md)** | Operational guide — when to scan, how to interpret, how teams act on findings |
-| **[docs/ANNOUNCEMENT.md](docs/ANNOUNCEMENT.md)** | Internal rollout announcement template for your team |
+| **[docs/ROLLOUT-GUIDE.md](docs/ROLLOUT-GUIDE.md)** | Operational guide — when to scan, how to interpret, team cadence |
+| **[docs/ANNOUNCEMENT.md](docs/ANNOUNCEMENT.md)** | Internal rollout announcement template |
 
-Start with **TOOLKIT.md** for the full picture. Use **PLAYBOOK.md** as a daily reference.
+Start with **QUICK-START.md** to get set up. Read **TOOLKIT.md** to see why it matters. Use **PLAYBOOK.md** as a daily reference.
 
 ## What's Included
 
@@ -88,8 +93,6 @@ Persistent knowledge base that lets Claude Code remember across sessions. Uses l
 
 ## Your First 5 Minutes
 
-After installing, open Claude Code in any project and run:
-
 ```
 /guide tour                          # see everything available
 /status                              # where am I? what's in flight?
@@ -98,7 +101,7 @@ After installing, open Claude Code in any project and run:
 /learn from session                  # save what you discovered
 ```
 
-For a detailed walkthrough with expected outputs, see the **[Your First 5 Minutes](TOOLKIT.md#your-first-5-minutes)** section in TOOLKIT.md.
+For a detailed walkthrough with expected outputs, see **[QUICK-START.md](QUICK-START.md)**. To practice on real (intentionally buggy) code, try the **[sandbox](examples/sandbox/)**.
 
 ## How It Works
 
@@ -116,22 +119,6 @@ argument-hint: Placeholder text for the argument
 **Agents** are dispatched automatically by commands like `/orchestrate` and `/audit`. They run as focused subprocesses with specific tools and return structured results.
 
 **CLAUDE.md** is a project-level file that Claude Code reads at session start. It stores commands, architecture notes, domain rules, and gotchas -- persistent context across sessions.
-
-## Coming Soon
-
-Documentation is being restructured for easier navigation:
-
-| Doc | What's changing |
-|-----|-----------------|
-| **QUICK-START.md** | Standalone getting started guide with a hands-on sandbox example |
-| **TOOLKIT.md** | Slimmed from 2000+ lines to ~500 — Before & After scenarios only |
-| **docs/COMMANDS.md** | Full reference for all 18 commands (extracted from TOOLKIT.md) |
-| **docs/AGENTS.md** | Full reference for all 7 agents (extracted from TOOLKIT.md) |
-| **docs/SELF-LEARNING.md** | How the 5-layer learning system works |
-| **docs/ADVANCED-PATTERNS.md** | Deep dives — skills crystallization, context recovery, post-audit remediation |
-| **examples/sandbox/** | A small broken Python app to practice toolkit commands on |
-
-The sandbox lets new users run `/scan`, `/tdd`, and `/verify` on real (intentionally buggy) code — learning by doing instead of reading.
 
 ## Contributing
 
