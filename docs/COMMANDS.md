@@ -1,6 +1,6 @@
 # Command Reference
 
-Full reference for all 21 slash commands in the Claude Code Team Toolkit.
+Full reference for all 22 slash commands in the Claude Code Team Toolkit.
 
 ---
 
@@ -440,3 +440,57 @@ Learnings saved: 3
 ```
 
 Copies the skill file to the toolkit repo, updates README.md, docs/COMMANDS.md, TOOLKIT.md, and optionally PLAYBOOK.md. Creates a feature branch and commits -- never pushes without your approval.
+
+---
+
+## Assemble -- Dynamic Agent Teams
+
+### `/team`
+
+**When to use:** Complex tasks that benefit from multiple specialized agents working together. The command analyzes your project and assembles the optimal team — no need to pick agents manually.
+
+```
+/team Add real-time notifications with WebSocket backend and toast UI
+/team Fix the N+1 query performance issue in the orders API
+/team Set up CI/CD pipeline with staging and production environments
+```
+
+Runs a 5-phase process:
+
+1. **Phase 0 — Project Intelligence**: Detects your stack (frameworks, languages, infra), reads scan scores, analyzes git churn hotspots, parses CLAUDE.md for known gaps
+2. **Phase 1 — Signal Analysis**: Maps detected domains to specialized agents, classifies task type, estimates complexity
+3. **Phase 2 — Team Proposal**: Presents the assembled team with justifications for every agent included AND excluded. Waits for your approval before proceeding.
+4. **Phase 3 — Layer-Strict Execution**: Dispatches agents in strict layers (analysis → implementation → review → docs → verification). Never starts a layer before the previous completes.
+5. **Phase 4 — Report**: Unified results with findings, conflicts resolved, and next steps.
+
+**Key rules:**
+- 9 agent hard cap (if more needed, split the task first)
+- `verification-agent` always runs last, never skipped
+- `code-reviewer` on every non-trivial team
+- Fullstack consolidation: uses `senior-fullstack-dev` instead of frontend + backend separately
+- AI surface detected = mandatory `security-auditor`
+
+**Available domain expert agents (10):**
+
+| Agent | Seniority | Domain |
+|-------|-----------|--------|
+| senior-frontend-dev | 15+ years | React/Vue/Angular, a11y, Core Web Vitals |
+| senior-backend-dev | 15+ years | API design, databases, caching, auth |
+| senior-fullstack-dev | 15+ years | End-to-end features, vertical slices |
+| senior-data-scientist | 12+ years | ML, statistics, experiment design |
+| ml-engineer | 12+ years | MLOps, model serving, pipelines |
+| devops-engineer | 12+ years | CI/CD, Docker, K8s, Terraform |
+| database-engineer | 15+ years | Schema, query optimization, migrations |
+| performance-engineer | 12+ years | Profiling, load testing, benchmarking |
+| sre-agent | 12+ years | Incident response, SLO management |
+| qa-strategist | 12+ years | Test strategy, contract testing |
+
+**Standard team compositions** (adjusted dynamically per project):
+
+| Team | Agents |
+|------|--------|
+| frontend | senior-frontend-dev + architect + tdd-agent + security-auditor + code-reviewer + documentation-agent + verification-agent |
+| backend | senior-backend-dev + database-engineer + architect + tdd-agent + security-auditor + code-reviewer + documentation-agent + verification-agent |
+| fullstack | senior-fullstack-dev + architect + database-engineer + tdd-agent + security-auditor + code-reviewer + verification-agent |
+| data | senior-data-scientist + ml-engineer + architect + tdd-agent + security-auditor + code-reviewer + verification-agent |
+| platform | devops-engineer + database-engineer + performance-engineer + sre-agent + security-auditor + code-reviewer + verification-agent |

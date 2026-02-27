@@ -1,6 +1,6 @@
 # Claude Code Team Toolkit
 
-21 slash commands + 7 specialized agents for [Claude Code](https://docs.anthropic.com/en/docs/claude-code) that enforce consistent, high-quality development workflows.
+22 slash commands + 17 specialized agents for [Claude Code](https://docs.anthropic.com/en/docs/claude-code) that enforce consistent, high-quality development workflows.
 
 **New here?** Jump to [QUICK-START.md](QUICK-START.md) for install + a hands-on walkthrough.
 
@@ -36,8 +36,8 @@ For project-scoped install, copy into `your-project/.claude/` instead.
 | **[QUICK-START.md](QUICK-START.md)** | Install guide + "Your First 5 Minutes" walkthrough + hands-on sandbox |
 | **[TOOLKIT.md](TOOLKIT.md)** | Why the toolkit matters — 9 Before & After scenarios |
 | **[PLAYBOOK.md](PLAYBOOK.md)** | Daily workflow recipes, prompt patterns, agent composition, AI/LLM security |
-| **[docs/COMMANDS.md](docs/COMMANDS.md)** | Full reference for all 21 commands |
-| **[docs/AGENTS.md](docs/AGENTS.md)** | Full reference for all 7 agents |
+| **[docs/COMMANDS.md](docs/COMMANDS.md)** | Full reference for all 22 commands |
+| **[docs/AGENTS.md](docs/AGENTS.md)** | Full reference for all 17 agents |
 | **[docs/SELF-LEARNING.md](docs/SELF-LEARNING.md)** | CLAUDE.md workflow + 5-layer learning system |
 | **[docs/ADVANCED-PATTERNS.md](docs/ADVANCED-PATTERNS.md)** | Skills crystallization, context recovery, post-audit remediation |
 | **[SETUP-MEMORY.md](SETUP-MEMORY.md)** | Memory system installation — LM Studio, MCP server, hybrid search |
@@ -49,7 +49,7 @@ Start with **QUICK-START.md** to get set up. Read **TOOLKIT.md** to see why it m
 
 ## What's Included
 
-### Commands (21)
+### Commands (22)
 
 | Command | Description |
 |---------|-------------|
@@ -74,8 +74,11 @@ Start with **QUICK-START.md** to get set up. Read **TOOLKIT.md** to see why it m
 | `/flag` | Flag findings for team review instead of fixing them unilaterally |
 | `/resolve-pr` | Fetch PR review comments, fix code, reply politely, push |
 | `/sync-skill-docs` | Sync new skills to the team toolkit repo with documentation updates |
+| `/team` | Dynamic agent team assembly -- analyzes project, selects optimal agents, executes in layers |
 
-### Agents (7)
+### Agents (17)
+
+**Role-Based Agents (7):**
 
 | Agent | Role |
 |-------|------|
@@ -86,6 +89,21 @@ Start with **QUICK-START.md** to get set up. Read **TOOLKIT.md** to see why it m
 | **documentation-agent** | Accurate, concise doc generation |
 | **research-agent** | Multi-source technical investigation |
 | **verification-agent** | Sequential test/lint/build pipeline |
+
+**Domain Expert Agents (10):**
+
+| Agent | Seniority | Domain |
+|-------|-----------|--------|
+| **senior-frontend-dev** | 15+ years | React/Vue/Angular, accessibility, Core Web Vitals |
+| **senior-backend-dev** | 15+ years | API design, databases, caching, auth |
+| **senior-fullstack-dev** | 15+ years | End-to-end features, vertical slices |
+| **senior-data-scientist** | 12+ years | ML, statistics, experiment design |
+| **ml-engineer** | 12+ years | MLOps, model serving, pipelines |
+| **devops-engineer** | 12+ years | CI/CD, Docker, K8s, Terraform |
+| **database-engineer** | 15+ years | Schema, query optimization, migrations |
+| **performance-engineer** | 12+ years | Profiling, load testing, benchmarking |
+| **sre-agent** | 12+ years | Incident response, SLO management |
+| **qa-strategist** | 12+ years | Test strategy, contract testing |
 
 ### Memory System
 
