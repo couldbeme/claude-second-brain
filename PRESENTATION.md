@@ -83,7 +83,7 @@ The failure mode: confident, plausible-looking code with subtle logic bugs that 
 
 **10 Domain Expert Agents:** senior-frontend-dev, senior-backend-dev, senior-fullstack-dev, senior-data-scientist, ml-engineer, devops-engineer, database-engineer, performance-engineer, sre-agent, qa-strategist
 
-> SPEAKER NOTES: 22 commands in 7 categories. You don't need to memorize them -- `/guide` tells you which command to use for any situation. The agents run automatically behind commands like `/orchestrate` and `/audit`. Each agent has restricted tool access (least-privilege) and a focused role.
+> SPEAKER NOTES: 24 commands in 7 categories. You don't need to memorize them -- `/guide` tells you which command to use for any situation. `/team` auto-detects your stack and assembles the right specialists. The agents run behind commands like `/orchestrate`, `/team`, and `/audit`. Each agent has restricted tool access (least-privilege) and a focused role.
 
 ---
 
@@ -871,7 +871,7 @@ Constraints:
 Agent Team:
   [research-agent #1]  Extract value props from 10 docs       (parallel)
   [research-agent #2]  Prepare 25+ skeptical Q&As with sources (parallel)
-  [Explore agent]      Audit codebase: 21 commands, 7 agents,  (parallel)
+  [Explore agent]      Audit codebase: 24 commands, 17 agents, (parallel)
                        2533 lines docs, 22 commits, 1301 LOC
   [orchestrator]       Synthesize all results into slide deck   (sequential)
 

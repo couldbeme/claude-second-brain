@@ -1,6 +1,8 @@
 # Agent Reference
 
-Agents are specialized subprocesses that commands dispatch for focused tasks. You don't call agents directly -- commands like `/orchestrate` and `/audit` use them automatically. Each agent has a focused role, specific tools, and a defined output format.
+17 agents total: 7 role-based (dispatched automatically) + 10 domain experts (dispatched by `/team` and `/orchestrate`).
+
+Most agents are dispatched automatically by commands. `/team` surfaces the proposed agent list for your review and modification before execution. `/orchestrate` lets you specify agents manually. Each agent has a focused role, specific tools, and a defined output format.
 
 | Agent | Role | Specialization |
 |-------|------|---------------|

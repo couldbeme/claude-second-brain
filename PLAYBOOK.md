@@ -35,6 +35,16 @@ Recipes, prompt patterns, and agent composition strategies for common developmen
 /commit-push-pr                 # quality-gated ship
 ```
 
+### When Things Go Wrong
+
+| Failure | Recovery |
+|---------|----------|
+| `/tdd` can't make tests pass | Run `/explain` on the module first, then retry with more context. If architectural, run `/team` instead. |
+| `/verify` returns RED | Run `/tdd Fix [the failing check]` for test failures. Run `/diagnose [error]` for build/lint failures. |
+| `/team` verification layer fails | Review the Phase 4 report — it identifies which agent's output caused the failure. Fix manually or re-run that layer. |
+| `/commit-push-pr` blocked | Tests must pass first. Run `/verify` to see what's failing, then `/tdd` to fix it. |
+| `/diagnose` misidentifies root cause | Provide more context: paste the full stack trace, mention recent changes, or run `/explain` on the affected module first. |
+
 ---
 
 ## Task Recipes
@@ -138,15 +148,18 @@ This is especially important when:
 
 ## Agent Composition Strategies
 
-### When to Use /orchestrate vs. Individual Commands
+### When to Use `/team` vs `/orchestrate` vs Individual Commands
 
 | Scenario | Use |
 |----------|-----|
 | Single concern (just tests, just docs, just security) | Specific command (`/tdd`, `/document`, `/audit`) |
-| Multiple concerns (design + impl + tests + security) | `/orchestrate` |
+| Complex task, don't know what agents to use | `/team` (auto-detects stack, selects agents for you) |
+| Complex task, you know exactly which agents | `/orchestrate` (you control the decomposition) |
 | Research-heavy task | `/research` first, then `/orchestrate` with findings |
 | Quick fix with tests | `/tdd` directly |
 | Understanding before changing | `/explain` then `/tdd` |
+
+**Rule of thumb:** Use `/team` when exploring. Use `/orchestrate` when you have a blueprint. Use the specific command when the task fits one domain.
 
 ### Effective /orchestrate Prompts
 

@@ -11,15 +11,32 @@ Get from zero to productive in 5 minutes.
 git clone <repo-url> claude-code-team-toolkit
 cd claude-code-team-toolkit
 
-# 2. Install commands + agents (global -- works in all projects)
-cp -r commands/ ~/.claude/commands/
-cp -r agents/ ~/.claude/agents/
-
-# 3. Install global rules
-cp CLAUDE.md.template ~/.claude/CLAUDE.md
+# 2. Run the installer
+./install.sh
 ```
 
-For project-scoped install, copy into `your-project/.claude/` instead.
+That's it. The installer:
+- Creates per-file symlinks for all 24 commands + 17 agents in `~/.claude/`
+- Symlinks memory-mcp source files and sets up the Python venv
+- Copies `CLAUDE.md.template` to `~/.claude/CLAUDE.md` (first time only)
+- Installs a git post-merge hook so `git pull` auto-syncs future updates
+
+**Updating:** Just `git pull` — the post-merge hook re-syncs automatically.
+
+**Dry run:** `./install.sh --check` shows what would change without modifying anything.
+
+**Migrating from manual `cp -r` install?** See [docs/MIGRATION.md](docs/MIGRATION.md).
+
+### Personal agents and commands
+
+Create personal agents directly in `~/.claude/agents/` as regular `.md` files:
+
+```bash
+# Personal files coexist alongside base symlinks — never touched by updates
+vim ~/.claude/agents/my-terraform-expert.md
+```
+
+`/team` auto-discovers personal agents and suggests them when relevant to the task.
 
 ### Optional: Memory system
 
@@ -47,7 +64,7 @@ Open Claude Code in any existing project and type:
 /guide tour
 ```
 
-Claude responds with a categorized overview of all 21 commands. You now know what's available.
+Claude responds with a categorized overview of all 24 commands. You now know what's available.
 
 ### Minute 2: Understand what you're working with
 
@@ -126,7 +143,7 @@ Five commands. Five minutes. You went from "what is this project?" to "PR is ope
 
 ## Hands-On Practice: The Sandbox
 
-Want to try the toolkit commands on real (intentionally buggy) code? The sandbox is a small Python app with 4 planted issues.
+Want to try the toolkit commands on real (intentionally buggy) code? The sandbox is a small Python app with 5 intentional issues.
 
 ```bash
 cd examples/sandbox/
@@ -190,4 +207,4 @@ That's how the toolkit grows itself -- `/metaprompt` is the command that creates
 - `/audit` -- full health check before releases
 - [TOOLKIT.md](TOOLKIT.md) -- the full guide with 9 Before & After scenarios
 - [PLAYBOOK.md](PLAYBOOK.md) -- daily workflow recipes and prompt patterns
-- [docs/COMMANDS.md](docs/COMMANDS.md) -- detailed reference for all 21 commands
+- [docs/COMMANDS.md](docs/COMMANDS.md) -- detailed reference for all 24 commands

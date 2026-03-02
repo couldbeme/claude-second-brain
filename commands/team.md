@@ -30,6 +30,19 @@ Gather project signals by running these simultaneously:
 1. Run: `git log --format=format: --name-only --since=3.months | grep -v '^$' | sort | uniq -c | sort -nr | head -15` (churn hotspots)
 2. Run: `git log --oneline --since=1.month | head -20` (recent activity for task type patterns)
 
+## Phase 0.5: Agent Discovery
+
+Discover all available agents (base + personal):
+
+1. Use Glob to find ALL `.md` files in `~/.claude/agents/` (global agents)
+2. Use Glob to find ALL `.md` files in `.claude/agents/` (project-scoped agents, if any)
+3. For each file found, read lines 1-5 to extract the YAML frontmatter `name:` and `description:` fields
+4. Build the agent registry:
+   - **Base agents** (17): architect, code-reviewer, database-engineer, devops-engineer, documentation-agent, ml-engineer, performance-engineer, qa-strategist, research-agent, security-auditor, senior-backend-dev, senior-data-scientist, senior-frontend-dev, senior-fullstack-dev, sre-agent, tdd-agent, verification-agent
+   - **Personal agents**: any agent NOT in the base set above
+
+Personal agents will be considered in Phase 2 (Team Proposal) after standard selection.
+
 ## Phase 1: Signal Analysis
 
 From Phase 0 data, determine:
@@ -130,6 +143,12 @@ LAYER 3 — Documentation (parallel with Layer 2):
 
 LAYER 4 — Verification (final gate):
   [x] verification-agent    reason: [always]
+
+PERSONAL AGENTS (from Phase 0.5 discovery):
+  [?] my-agent-name          reason: description matches [domain/keyword]
+  [?] other-custom-agent     reason: description mentions [relevant tech]
+  (Listed only if personal agents were discovered AND their description
+   has keyword overlap with the task or detected stack. Omit section if none.)
 
 NOT INCLUDED (and why):
   - performance-engineer: not a performance task; add if needed

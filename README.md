@@ -1,6 +1,6 @@
 # Claude Code Team Toolkit
 
-22 slash commands + 17 specialized agents for [Claude Code](https://docs.anthropic.com/en/docs/claude-code) that enforce consistent, high-quality development workflows.
+24 slash commands + 17 specialized agents for [Claude Code](https://docs.anthropic.com/en/docs/claude-code) that enforce consistent, high-quality development workflows.
 
 **New here?** Jump to [QUICK-START.md](QUICK-START.md) for install + a hands-on walkthrough.
 
@@ -11,23 +11,19 @@
 git clone <repo-url> claude-code-team-toolkit
 cd claude-code-team-toolkit
 
-# 2. Install commands + agents (global)
-cp -r commands/ ~/.claude/commands/
-cp -r agents/ ~/.claude/agents/
+# 2. Install (symlinks + memory-mcp venv + git hook)
+./install.sh
 
-# 3. Install global rules
-cp CLAUDE.md.template ~/.claude/CLAUDE.md
+# 3. Set up the memory system (see SETUP-MEMORY.md)
 
-# 4. Set up the memory system (see SETUP-MEMORY.md)
-
-# 5. Open Claude Code in any project and try:
+# 4. Open Claude Code in any project and try:
 #    /guide tour                  # new? start here
 #    /status
 #    /explain src/
 #    /tdd Add input validation
 ```
 
-For project-scoped install, copy into `your-project/.claude/` instead.
+Updates auto-sync on `git pull` via post-merge hook. Personal agents go in `~/.claude/agents/` as regular files — never touched by updates. See [QUICK-START.md](QUICK-START.md) for full details.
 
 ## Documentation
 
@@ -36,7 +32,8 @@ For project-scoped install, copy into `your-project/.claude/` instead.
 | **[QUICK-START.md](QUICK-START.md)** | Install guide + "Your First 5 Minutes" walkthrough + hands-on sandbox |
 | **[TOOLKIT.md](TOOLKIT.md)** | Why the toolkit matters — 9 Before & After scenarios |
 | **[PLAYBOOK.md](PLAYBOOK.md)** | Daily workflow recipes, prompt patterns, agent composition, AI/LLM security |
-| **[docs/COMMANDS.md](docs/COMMANDS.md)** | Full reference for all 22 commands |
+| **[docs/TOP-COMMANDS.md](docs/TOP-COMMANDS.md)** | Top 10 commands cheat sheet with examples + decision tree |
+| **[docs/COMMANDS.md](docs/COMMANDS.md)** | Full reference for all 24 commands |
 | **[docs/AGENTS.md](docs/AGENTS.md)** | Full reference for all 17 agents |
 | **[docs/SELF-LEARNING.md](docs/SELF-LEARNING.md)** | CLAUDE.md workflow + 5-layer learning system |
 | **[docs/ADVANCED-PATTERNS.md](docs/ADVANCED-PATTERNS.md)** | Skills crystallization, context recovery, post-audit remediation |

@@ -1,6 +1,6 @@
 # Command Reference
 
-Full reference for all 22 slash commands in the Claude Code Team Toolkit.
+Full reference for all 24 slash commands in the Claude Code Team Toolkit.
 
 ---
 
@@ -74,7 +74,7 @@ cause, not just the symptom.
 Want me to run `/recall auth bug` now?
 ```
 
-**Tour mode:** Run `/guide tour` to get a categorized overview of all 21 commands grouped by purpose (Orient, Build, Analyze, Research & Learn, Power Tools).
+**Tour mode:** Run `/guide tour` to get a categorized overview of all 24 commands grouped by purpose (Orient, Build, Analyze, Research & Learn, Power Tools).
 
 ---
 
@@ -294,6 +294,31 @@ Classifies (project-specific, global, tool-usage, pattern), formats as one-liner
 
 Exports knowledge to JSON, imports with conflict resolution (newer wins).
 
+### `/context-save`
+
+**When to use:** Before long operations, when the session feels large (60+ messages), or before spawning many agents.
+
+```
+/context-save
+/context-save implementing rate limiter, middleware done, webhooks next
+```
+
+Checkpoints current task state so it survives context compaction. Gathers task description, decisions made (with reasoning), progress, key files, gotchas, and blockers from conversation context -- without re-reading files. Saves to memory MCP if available, otherwise falls back to `.claude/checkpoint.md`.
+
+**Example output:**
+```
+CONTEXT SAVED
+=============
+Task:     Rate limiter implementation
+Progress: 3/5 steps complete
+Saved to: memory (category: context, importance: 9)
+Next:     Implement webhook handler in src/webhooks.py following pattern from src/events.py:45
+
+To recover after compaction:
+  /recall rate limiter              — if memory is available
+  Read .claude/checkpoint.md        — if using file fallback
+```
+
 ---
 
 ## Meta -- Level Up Your Prompts
@@ -375,6 +400,32 @@ Next time:
 ```
 
 This is the **command that creates commands** -- how the toolkit grows itself.
+
+### `/economy`
+
+**When to use:** When you want to optimize token consumption while maintaining result quality. Run at session start or when working on large codebases.
+
+```
+/economy
+/economy Apply economy rules to current task
+```
+
+Applies 7 token-efficiency rules: search before read (Glob/Grep before Read), batch tool calls (parallel when independent), smart model selection (haiku for simple tasks, sonnet for moderate, opus for complex), avoid re-reading files already in context, compress output (tables over prose), smart context management, and minimize subagent count.
+
+**Example output:**
+```
+ECONOMY REPORT
+==============
+Tool calls:    12 (3 batched → saved ~6 round-trips)
+Files read:    8 (2 skipped — already in context)
+Agents used:   2 (consolidated from 4 potential)
+Est. savings: ~40% token reduction vs unoptimized
+
+Rules applied:
+  ✓ Search-before-read: Used Grep to find 3 relevant files before reading
+  ✓ Batched parallel: 3 independent reads in single call
+  ✓ Context reuse: Skipped re-reading CLAUDE.md and README.md
+```
 
 ---
 
@@ -469,6 +520,8 @@ Runs a 5-phase process:
 - `code-reviewer` on every non-trivial team
 - Fullstack consolidation: uses `senior-fullstack-dev` instead of frontend + backend separately
 - AI surface detected = mandatory `security-auditor`
+
+**`/team` vs `/orchestrate`:** `/team` auto-detects your stack and selects agents for you — use it when you don't know which specialists to pick. `/orchestrate` lets you control the decomposition — use it when you have a clear plan. See [TOP-COMMANDS.md](TOP-COMMANDS.md) for the full decision tree.
 
 **Available domain expert agents (10):**
 
