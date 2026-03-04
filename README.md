@@ -1,6 +1,6 @@
 # Claude Code Team Toolkit
 
-24 slash commands + 17 specialized agents for [Claude Code](https://docs.anthropic.com/en/docs/claude-code) that enforce consistent, high-quality development workflows.
+25 slash commands + 17 specialized agents for [Claude Code](https://docs.anthropic.com/en/docs/claude-code) that enforce consistent, high-quality development workflows.
 
 **New here?** Jump to [QUICK-START.md](QUICK-START.md) for install + a hands-on walkthrough.
 
@@ -33,7 +33,7 @@ Updates auto-sync on `git pull` via post-merge hook. Personal agents go in `~/.c
 | **[TOOLKIT.md](TOOLKIT.md)** | Why the toolkit matters — 9 Before & After scenarios |
 | **[PLAYBOOK.md](PLAYBOOK.md)** | Daily workflow recipes, prompt patterns, agent composition, AI/LLM security |
 | **[docs/TOP-COMMANDS.md](docs/TOP-COMMANDS.md)** | Top 10 commands cheat sheet with examples + decision tree |
-| **[docs/COMMANDS.md](docs/COMMANDS.md)** | Full reference for all 24 commands |
+| **[docs/COMMANDS.md](docs/COMMANDS.md)** | Full reference for all 25 commands |
 | **[docs/AGENTS.md](docs/AGENTS.md)** | Full reference for all 17 agents |
 | **[docs/SELF-LEARNING.md](docs/SELF-LEARNING.md)** | CLAUDE.md workflow + 5-layer learning system |
 | **[docs/ADVANCED-PATTERNS.md](docs/ADVANCED-PATTERNS.md)** | Skills crystallization, context recovery, post-audit remediation |
@@ -46,7 +46,7 @@ Start with **QUICK-START.md** to get set up. Read **TOOLKIT.md** to see why it m
 
 ## What's Included
 
-### Commands (22)
+### Commands (25)
 
 | Command | Description |
 |---------|-------------|
@@ -72,6 +72,9 @@ Start with **QUICK-START.md** to get set up. Read **TOOLKIT.md** to see why it m
 | `/resolve-pr` | Fetch PR review comments, fix code, reply politely, push |
 | `/sync-skill-docs` | Sync new skills to the team toolkit repo with documentation updates |
 | `/team` | Dynamic agent team assembly -- analyzes project, selects optimal agents, executes in layers |
+| `/harden-memory` | Audit and harden the memory auto-sync pipeline end-to-end |
+| `/economy` | Optimize token consumption while maintaining result quality |
+| `/context-save` | Checkpoint task state to survive context compaction |
 
 ### Agents (17)
 
