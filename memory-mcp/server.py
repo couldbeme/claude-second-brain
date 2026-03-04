@@ -89,11 +89,13 @@ async def memory_save(
     tags: list[str] | None = None,
     project: str | None = None,
     importance: int = 5,
+    visibility: str = "personal",
 ) -> str:
     """Save a piece of knowledge to the memory system.
 
     Categories: decision, pattern, error, solution, learning, context, rule, persona.
     Importance: 1-10 scale (10 = critical rules, 1 = temporary notes).
+    Visibility: personal (default), team, or public. persona/user_model categories are always forced to personal.
     """
     tags = tags or []
 
@@ -109,7 +111,12 @@ async def memory_save(
         importance=importance,
         source="manual",
         embedding=embedding,
+        visibility=visibility,
     )
+
+    # Return effective visibility (may have been forced to "personal" by db.save)
+    saved = db.get(mem_id)
+    effective_visibility = saved["visibility"] if saved else visibility
 
     embed_status = "with embedding" if embedding else "without embedding (LM Studio unavailable)"
     return json.dumps({
@@ -117,6 +124,7 @@ async def memory_save(
         "id": mem_id,
         "category": category,
         "importance": importance,
+        "visibility": effective_visibility,
         "embedding": embed_status,
     })
 
@@ -164,8 +172,12 @@ async def memory_update(
     tags: list[str] | None = None,
     importance: int | None = None,
     category: str | None = None,
+    visibility: str | None = None,
 ) -> str:
-    """Update an existing memory. Re-embeds content if text changes."""
+    """Update an existing memory. Re-embeds content if text changes.
+
+    Visibility: personal, team, or public. persona/user_model categories are always forced to personal.
+    """
     embedding = None
     if content is not None:
         embedding = await embedder.embed(content)
@@ -178,6 +190,7 @@ async def memory_update(
         importance=importance,
         category=category,
         embedding=embedding,
+        visibility=visibility,
     )
 
     if success:
@@ -203,15 +216,20 @@ async def memory_delete(id: str, confirm: bool = False) -> str:
 async def memory_list(
     category: str | None = None,
     project: str | None = None,
+    visibility: str | None = None,
     limit: int = 20,
     offset: int = 0,
     sort_by: str = "updated_at",
     sort_order: str = "desc",
 ) -> str:
-    """List memories with optional filters. Returns compact summaries."""
+    """List memories with optional filters. Returns compact summaries.
+
+    Visibility filter: personal, team, or public. Omit to list all.
+    """
     results = db.list_memories(
         category=category,
         project=project,
+        visibility=visibility,
         limit=limit,
         offset=offset,
         sort_by=sort_by,

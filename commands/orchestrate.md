@@ -39,6 +39,7 @@ Rules for agent dispatch:
 - Wait for dependencies before launching dependent agents
 - Give each agent: the subtask description, relevant file paths, success criteria
 - Each agent must return: summary of what was done, files modified/created, and any concerns
+- Every agent prompt must include: "Tag any non-obvious discovery with [LEARNING] in your response."
 
 ## Phase 3: Integration
 

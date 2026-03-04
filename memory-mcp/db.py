@@ -30,6 +30,10 @@ class MemoryDB:
         self.conn.enable_load_extension(False)
         self._init_schema()
 
+    # Categories that are always forced to 'personal' visibility
+    PERSONAL_ONLY_CATEGORIES = ("persona", "user_model")
+    VALID_VISIBILITIES = ("personal", "team", "public")
+
     def _init_schema(self):
         self.conn.executescript("""
             CREATE TABLE IF NOT EXISTS memories (
@@ -43,6 +47,7 @@ class MemoryDB:
                 session_id TEXT,
                 importance INTEGER DEFAULT 5,
                 access_count INTEGER DEFAULT 0,
+                visibility TEXT NOT NULL DEFAULT 'personal',
                 created_at TEXT DEFAULT (datetime('now')),
                 updated_at TEXT DEFAULT (datetime('now')),
                 expires_at TEXT,
@@ -55,6 +60,22 @@ class MemoryDB:
             CREATE INDEX IF NOT EXISTS idx_memories_importance ON memories(importance DESC);
             CREATE INDEX IF NOT EXISTS idx_memories_updated ON memories(updated_at DESC);
         """)
+
+        # Migration: add visibility column to existing tables
+        columns = [
+            row[1] for row in self.conn.execute("PRAGMA table_info(memories)").fetchall()
+        ]
+        if "visibility" not in columns:
+            self.conn.execute(
+                "ALTER TABLE memories ADD COLUMN visibility TEXT NOT NULL DEFAULT 'personal'"
+            )
+            self.conn.commit()
+
+        # Create visibility index (after migration ensures column exists)
+        self.conn.execute(
+            "CREATE INDEX IF NOT EXISTS idx_memories_visibility ON memories(visibility)"
+        )
+        self.conn.commit()
 
         # Create FTS5 table if not exists
         existing = self.conn.execute(
@@ -104,15 +125,20 @@ class MemoryDB:
         session_id: Optional[str] = None,
         embedding: Optional[list[float]] = None,
         mem_id: Optional[str] = None,
+        visibility: str = "personal",
     ) -> str:
         """Save a memory and return its ID. Pass mem_id to preserve an existing ID (e.g. during import)."""
         mem_id = mem_id or _generate_id()
         tags_json = json.dumps(tags or [])
 
+        # Force personal visibility for sensitive categories
+        if category in self.PERSONAL_ONLY_CATEGORIES:
+            visibility = "personal"
+
         self.conn.execute(
-            """INSERT INTO memories (id, content, summary, category, project, tags, source, session_id, importance)
-               VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)""",
-            (mem_id, content, summary, category, project, tags_json, source, session_id, importance),
+            """INSERT INTO memories (id, content, summary, category, project, tags, source, session_id, importance, visibility)
+               VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+            (mem_id, content, summary, category, project, tags_json, source, session_id, importance, visibility),
         )
 
         # Get the rowid for FTS and vector indexing
@@ -140,7 +166,7 @@ class MemoryDB:
         """Get a memory by ID. Increments access_count."""
         row = self.conn.execute(
             """SELECT id, content, summary, category, project, tags, source,
-                      importance, access_count, created_at, updated_at
+                      importance, access_count, created_at, updated_at, visibility
                FROM memories WHERE id = ?""",
             (mem_id,),
         ).fetchone()
@@ -167,6 +193,7 @@ class MemoryDB:
             "access_count": row[8] + 1,  # Reflect the increment
             "created_at": row[9],
             "updated_at": row[10],
+            "visibility": row[11],
         }
 
     def delete(self, mem_id: str) -> bool:
@@ -210,6 +237,7 @@ class MemoryDB:
         importance: Optional[int] = None,
         category: Optional[str] = None,
         embedding: Optional[list[float]] = None,
+        visibility: Optional[str] = None,
     ) -> bool:
         """Update a memory. Returns True if updated, False if not found."""
         existing = self.conn.execute(
@@ -251,6 +279,14 @@ class MemoryDB:
         if category is not None:
             updates.append("category = ?")
             params.append(category)
+        # Enforce personal-only for sensitive categories, even if visibility wasn't passed
+        effective_cat = category or old_category
+        if effective_cat in self.PERSONAL_ONLY_CATEGORIES:
+            updates.append("visibility = ?")
+            params.append("personal")
+        elif visibility is not None:
+            updates.append("visibility = ?")
+            params.append(visibility)
 
         updates.append("updated_at = datetime('now')")
         params.append(mem_id)
@@ -288,6 +324,7 @@ class MemoryDB:
         self,
         category: Optional[str] = None,
         project: Optional[str] = None,
+        visibility: Optional[str] = None,
         limit: int = 20,
         offset: int = 0,
         sort_by: str = "updated_at",
@@ -312,10 +349,13 @@ class MemoryDB:
         if project is not None:
             conditions.append("project = ?")
             params.append(project)
+        if visibility is not None:
+            conditions.append("visibility = ?")
+            params.append(visibility)
 
         where = f"WHERE {' AND '.join(conditions)}" if conditions else ""
         query = f"""
-            SELECT id, content, summary, category, project, tags, importance, access_count, updated_at
+            SELECT id, content, summary, category, project, tags, importance, access_count, updated_at, visibility
             FROM memories {where}
             ORDER BY {safe_sort} {safe_order}
             LIMIT ? OFFSET ?
@@ -334,6 +374,7 @@ class MemoryDB:
                 "importance": r[6],
                 "access_count": r[7],
                 "updated_at": r[8],
+                "visibility": r[9],
             }
             for r in rows
         ]

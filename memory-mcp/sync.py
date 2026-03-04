@@ -4,6 +4,7 @@ Usage:
     python sync.py backup              # Commit memory.db to private git repo (recommended)
     python sync.py backup --push       # Commit + push to remote
     python sync.py export              # Export all memories to JSON
+    python sync.py export --scope team # Export only team-visible memories (strips personal)
     python sync.py import              # Import from JSON, merging with local
     python sync.py export --pretty     # Human-readable JSON
     python sync.py stats               # Show sync status
@@ -36,8 +37,24 @@ DEFAULT_DB_PATH = os.environ.get(
 DEFAULT_REPO_DIR = os.environ.get("SYNC_REPO_DIR", None)
 
 
-def export_memories(pretty: bool = False, db_path: str = DEFAULT_DB_PATH, export_path: str = DEFAULT_EXPORT_PATH) -> int:
-    """Export all memories to JSON file. Returns the count of exported memories."""
+# Categories that are always personal regardless of visibility field
+PERSONAL_ONLY_CATEGORIES = ("persona", "user_model")
+
+
+def export_memories(
+    pretty: bool = False,
+    db_path: str = DEFAULT_DB_PATH,
+    export_path: str = DEFAULT_EXPORT_PATH,
+    scope: str = "all",
+) -> int:
+    """Export memories to JSON file. Returns the count of exported memories.
+
+    Scope controls what is included:
+      - "all" (default): export everything, for personal backup/sync.
+      - "team": export only team/public-visible memories, strip personal-only
+        categories (persona, user_model), and omit embedding vectors.
+        Safe for sharing via PR.
+    """
     with MemoryDB(db_path) as db:
         memories = db.list_memories(limit=10000, sort_by="created_at", sort_order="asc")
 
@@ -45,17 +62,31 @@ def export_memories(pretty: bool = False, db_path: str = DEFAULT_DB_PATH, export
         full_memories = []
         for m in memories:
             full = db.get(m["id"])
-            if full:
-                # Remove access_count from export (local metric)
-                full.pop("access_count", None)
-                full_memories.append(full)
+            if not full:
+                continue
+
+            # Remove access_count from export (local metric)
+            full.pop("access_count", None)
+
+            if scope == "team":
+                # Skip personal-visibility memories
+                if full.get("visibility", "personal") == "personal":
+                    continue
+                # Double-check: skip personal-only categories even if visibility was wrong
+                if full.get("category") in PERSONAL_ONLY_CATEGORIES:
+                    continue
+
+            full_memories.append(full)
 
     os.makedirs(os.path.dirname(export_path), exist_ok=True)
     with open(export_path, "w") as f:
         json.dump(full_memories, f, indent=2 if pretty else None, ensure_ascii=False)
     count = len(full_memories)
-    print(f"Exported {count} memories to {export_path}")
+    scope_label = f" (scope: {scope})" if scope != "all" else ""
+    print(f"Exported {count} memories{scope_label} to {export_path}")
     print(f"File size: {os.path.getsize(export_path):,} bytes")
+    if scope == "team":
+        print("Note: personal memories and persona/user_model categories excluded.")
     return count
 
 
@@ -104,6 +135,7 @@ def import_memories(db_path: str = DEFAULT_DB_PATH, export_path: str = DEFAULT_E
                     project=mem.get("project"),
                     importance=mem.get("importance", 5),
                     source=mem.get("source", "sync"),
+                    visibility=mem.get("visibility", "personal"),
                 )
                 created += 1
             else:
@@ -262,11 +294,17 @@ def scheduled_export(
     export_path: str = DEFAULT_EXPORT_PATH,
     push: bool = False,
     repo_dir: str | None = None,
+    scope: str = "all",
 ) -> dict:
     """Export memories and auto-commit to git. Designed for cron/launchd.
 
+    IMPORTANT: Use scope="team" when committing to any shared/public repo.
+    Default scope="all" includes personal memories and is only safe for
+    private backup repos.
+
     Args:
         repo_dir: Git repo to commit into. Defaults to the directory of sync.py.
+        scope: "all" for personal backup, "team" for shared repos (strips personal data).
 
     Returns a summary dict: {exported, committed, pushed, error}.
     Never raises — all errors are caught and returned in the dict.
@@ -277,7 +315,7 @@ def scheduled_export(
     try:
         # 1. Export
         result["exported"] = export_memories(
-            db_path=db_path, export_path=export_path, pretty=True
+            db_path=db_path, export_path=export_path, pretty=True, scope=scope
         )
 
         # 2. Git add
@@ -326,7 +364,12 @@ def main():
 
     cmd = sys.argv[1]
     if cmd == "export":
-        export_memories(pretty="--pretty" in sys.argv)
+        scope = "all"
+        if "--scope" in sys.argv:
+            idx = sys.argv.index("--scope")
+            if idx + 1 < len(sys.argv):
+                scope = sys.argv[idx + 1]
+        export_memories(pretty="--pretty" in sys.argv, scope=scope)
     elif cmd == "import":
         import_memories()
     elif cmd == "stats":

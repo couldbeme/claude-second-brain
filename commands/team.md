@@ -175,6 +175,7 @@ Wait for all Layer 0 agents to complete. Their output becomes context for Layer 
 ### Layer 1 — Implementation (parallel)
 Launch all implementation agents simultaneously using the Task tool.
 - Give each agent: the task, the architect's blueprint, their specific file scope
+- Include in every agent prompt: "Tag any non-obvious discovery with [LEARNING] in your response."
 - Domain experts implement in their area
 - `tdd-agent` writes tests for the implementation
 - `database-engineer` handles schema/migration if applicable
