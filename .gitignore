@@ -10,3 +10,7 @@ memory/memories-export.json
 
 # Personal customizations (not shared with team)
 personal/
+
+# Lexicon — partnership-DSL kept private (sensitive co-curated vocabulary)
+docs/LEXICON.md
+docs/LEXICON-*.md
