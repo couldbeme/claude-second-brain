@@ -1,6 +1,6 @@
 ---
-description: Generate an optimized prompt/command for a specific task
-argument-hint: Describe the task you want a prompt for
+description: Transform a fuzzy task description into a structured, phased, executable prompt
+argument-hint: Describe the task you want an expert prompt for
 ---
 
 # Metaprompt Generator
@@ -45,6 +45,6 @@ Task: $ARGUMENTS
    - Token efficiency (is it unnecessarily verbose?)
 
 5. **Present the prompt** and ask if the user wants to:
-   - Use it immediately as instructions
-   - Save it as a slash command (project or global)
-   - Iterate on it
+   - Use it immediately as instructions (primary use case)
+   - Iterate on it further
+   - Save it as a slash command (project or global) — for recurring workflows

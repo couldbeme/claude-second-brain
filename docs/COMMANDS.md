@@ -341,7 +341,7 @@ Agents discover things, pass findings to each other, escalate decisions to you, 
 
 ### `/metaprompt`
 
-**When to use:** Any task where you want dramatically better results than a casual prompt would give you.
+**When to use:** Whenever the gap between your vague intention and the prompt Claude actually needs is more than a sentence.
 
 ```
 /metaprompt Refactor the authentication module to use JWT with refresh tokens
@@ -399,7 +399,7 @@ Next time:
 /new-endpoint products GET,POST,DELETE
 ```
 
-This is the **command that creates commands** -- how the toolkit grows itself.
+This is the **prompt upskiller** — it closes the gap between fuzzy intention and structured execution plan. Saving it as a command is optional; using it immediately is the primary workflow.
 
 ### `/economy`
 

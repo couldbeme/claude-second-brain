@@ -63,7 +63,7 @@ Start with **QUICK-START.md** to get set up. Read **TOOLKIT.md** to see why it m
 | `/gap-analysis` | Find missing tests, docs, error handling, types |
 | `/research` | Deep 3-track technical research with sources |
 | `/orchestrate` | Multi-agent task decomposition and execution |
-| `/metaprompt` | Generate optimized prompts from a task description |
+| `/metaprompt` | Upskill a fuzzy task description into a phased, quality-gated, executable prompt |
 | `/sync-memories` | Export/import knowledge between machines |
 | `/guide` | Interactive toolkit assistant -- suggests commands and workflows for your task |
 | `/diagnose` | Interpret error screenshots, logs, or stack traces and diagnose + fix |

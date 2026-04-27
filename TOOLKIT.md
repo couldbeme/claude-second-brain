@@ -43,7 +43,7 @@ This toolkit codifies engineering best practices into repeatable, quality-enforc
 | `/gap-analysis` | Find missing tests, docs, error handling, types |
 | `/research` | Deep 3-track technical research with sources |
 | `/orchestrate` | Decompose complex tasks into multi-agent workflows |
-| `/metaprompt` | Generate optimized prompts from a task description |
+| `/metaprompt` | Upskill a fuzzy task into a structured, phased, executable prompt |
 | `/sync-memories` | Export/import knowledge between machines |
 | `/guide` | Interactive toolkit assistant -- suggests commands and workflows |
 | `/diagnose` | Interpret error screenshots, logs, or stack traces and fix |
@@ -378,7 +378,7 @@ Claude: [follows the engineered prompt]
         [final report: 4 issues fixed, 0 regressions, +8 tests]
 ```
 
-**The difference:** The basic prompt produces basic work. `/metaprompt` transforms it into a structured execution plan with phases, tool assignments, safety constraints, and verification -- the kind of prompt a senior engineer would write. You get expert-level prompt engineering without being a prompt engineer.
+**The difference:** The basic prompt produces basic work. `/metaprompt` transforms it into a structured execution plan with phases, tool assignments, safety constraints, and verification -- the kind of prompt a senior engineer would write. You get expert-level prompt engineering without being a prompt engineer. Command creation is optional — the upskilling is the point.
 
 ### 9. Error screenshot → manual debugging vs. visual diagnosis
 
