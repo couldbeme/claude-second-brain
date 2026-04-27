@@ -48,6 +48,9 @@ class MemoryDB:
                 importance INTEGER DEFAULT 5,
                 access_count INTEGER DEFAULT 0,
                 visibility TEXT NOT NULL DEFAULT 'personal',
+                confidence REAL DEFAULT 0.75,
+                valid_time TEXT,
+                transaction_time TEXT DEFAULT (datetime('now')),
                 created_at TEXT DEFAULT (datetime('now')),
                 updated_at TEXT DEFAULT (datetime('now')),
                 expires_at TEXT,
@@ -61,7 +64,7 @@ class MemoryDB:
             CREATE INDEX IF NOT EXISTS idx_memories_updated ON memories(updated_at DESC);
         """)
 
-        # Migration: add visibility column to existing tables
+        # Migration: add columns to existing tables as needed (additive-only, never DROP)
         columns = [
             row[1] for row in self.conn.execute("PRAGMA table_info(memories)").fetchall()
         ]
@@ -69,12 +72,40 @@ class MemoryDB:
             self.conn.execute(
                 "ALTER TABLE memories ADD COLUMN visibility TEXT NOT NULL DEFAULT 'personal'"
             )
-            self.conn.commit()
+        if "confidence" not in columns:
+            self.conn.execute(
+                "ALTER TABLE memories ADD COLUMN confidence REAL DEFAULT 0.75"
+            )
+        if "valid_time" not in columns:
+            self.conn.execute(
+                "ALTER TABLE memories ADD COLUMN valid_time TEXT"
+            )
+        if "transaction_time" not in columns:
+            # SQLite ALTER TABLE does not support non-constant DEFAULT expressions.
+            # Add the column with NULL default; new rows supply the value explicitly.
+            self.conn.execute(
+                "ALTER TABLE memories ADD COLUMN transaction_time TEXT"
+            )
+        self.conn.commit()
 
         # Create visibility index (after migration ensures column exists)
         self.conn.execute(
             "CREATE INDEX IF NOT EXISTS idx_memories_visibility ON memories(visibility)"
         )
+        self.conn.commit()
+
+        # Contradictions table for drift detection
+        self.conn.execute("""
+            CREATE TABLE IF NOT EXISTS contradictions (
+                id TEXT PRIMARY KEY,
+                memory_a_id TEXT NOT NULL,
+                memory_b_id TEXT NOT NULL,
+                detected_at TEXT DEFAULT (datetime('now')),
+                resolution TEXT DEFAULT 'unresolved',
+                FOREIGN KEY (memory_a_id) REFERENCES memories(id),
+                FOREIGN KEY (memory_b_id) REFERENCES memories(id)
+            )
+        """)
         self.conn.commit()
 
         # Create FTS5 table if not exists
@@ -126,19 +157,24 @@ class MemoryDB:
         embedding: Optional[list[float]] = None,
         mem_id: Optional[str] = None,
         visibility: str = "personal",
+        confidence: float = 0.75,
     ) -> str:
         """Save a memory and return its ID. Pass mem_id to preserve an existing ID (e.g. during import)."""
         mem_id = mem_id or _generate_id()
         tags_json = json.dumps(tags or [])
+        confidence = max(0.0, min(1.0, confidence))
 
         # Force personal visibility for sensitive categories
         if category in self.PERSONAL_ONLY_CATEGORIES:
             visibility = "personal"
 
         self.conn.execute(
-            """INSERT INTO memories (id, content, summary, category, project, tags, source, session_id, importance, visibility)
-               VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
-            (mem_id, content, summary, category, project, tags_json, source, session_id, importance, visibility),
+            """INSERT INTO memories
+               (id, content, summary, category, project, tags, source, session_id,
+                importance, visibility, confidence, transaction_time)
+               VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'))""",
+            (mem_id, content, summary, category, project, tags_json, source, session_id,
+             importance, visibility, confidence),
         )
 
         # Get the rowid for FTS and vector indexing
@@ -160,13 +196,17 @@ class MemoryDB:
             )
 
         self.conn.commit()
+
+        # Contradiction detection (non-blocking)
+        self._detect_contradictions(mem_id, content, project, tags or [])
+
         return mem_id
 
     def get(self, mem_id: str) -> Optional[dict]:
         """Get a memory by ID. Increments access_count."""
         row = self.conn.execute(
             """SELECT id, content, summary, category, project, tags, source,
-                      importance, access_count, created_at, updated_at, visibility
+                      importance, access_count, created_at, updated_at, visibility, confidence
                FROM memories WHERE id = ?""",
             (mem_id,),
         ).fetchone()
@@ -194,6 +234,7 @@ class MemoryDB:
             "created_at": row[9],
             "updated_at": row[10],
             "visibility": row[11],
+            "confidence": row[12] if row[12] is not None else 0.75,
         }
 
     def delete(self, mem_id: str) -> bool:
@@ -238,6 +279,7 @@ class MemoryDB:
         category: Optional[str] = None,
         embedding: Optional[list[float]] = None,
         visibility: Optional[str] = None,
+        confidence: Optional[float] = None,
     ) -> bool:
         """Update a memory. Returns True if updated, False if not found."""
         existing = self.conn.execute(
@@ -287,6 +329,9 @@ class MemoryDB:
         elif visibility is not None:
             updates.append("visibility = ?")
             params.append(visibility)
+        if confidence is not None:
+            updates.append("confidence = ?")
+            params.append(max(0.0, min(1.0, confidence)))
 
         updates.append("updated_at = datetime('now')")
         params.append(mem_id)
@@ -355,7 +400,7 @@ class MemoryDB:
 
         where = f"WHERE {' AND '.join(conditions)}" if conditions else ""
         query = f"""
-            SELECT id, content, summary, category, project, tags, importance, access_count, updated_at, visibility
+            SELECT id, content, summary, category, project, tags, importance, access_count, updated_at, visibility, confidence
             FROM memories {where}
             ORDER BY {safe_sort} {safe_order}
             LIMIT ? OFFSET ?
@@ -375,6 +420,7 @@ class MemoryDB:
                 "access_count": r[7],
                 "updated_at": r[8],
                 "visibility": r[9],
+                "confidence": r[10] if r[10] is not None else 0.75,
             }
             for r in rows
         ]
@@ -388,7 +434,7 @@ class MemoryDB:
         try:
             rows = self.conn.execute(
                 """SELECT m.id, m.content, m.summary, m.category, m.project, m.tags,
-                          m.importance, bm25(memory_fts) as score
+                          m.importance, bm25(memory_fts) as score, m.confidence
                    FROM memory_fts f
                    JOIN memories m ON f.rowid = m.rowid
                    WHERE memory_fts MATCH ?
@@ -409,6 +455,7 @@ class MemoryDB:
                 "tags": json.loads(r[5]) if r[5] else [],
                 "importance": r[6],
                 "score": r[7],
+                "confidence": r[8] if r[8] is not None else 0.75,
             }
             for r in rows
         ]
@@ -420,7 +467,7 @@ class MemoryDB:
         try:
             rows = self.conn.execute(
                 """SELECT v.rowid, v.distance, m.id, m.content, m.summary, m.category,
-                          m.project, m.tags, m.importance
+                          m.project, m.tags, m.importance, m.confidence
                    FROM memory_vectors v
                    JOIN memories m ON v.rowid = m.rowid
                    WHERE v.embedding MATCH ?
@@ -441,9 +488,140 @@ class MemoryDB:
                 "project": r[6],
                 "tags": json.loads(r[7]) if r[7] else [],
                 "importance": r[8],
+                "confidence": r[9] if r[9] is not None else 0.75,
             }
             for r in rows
         ]
+
+    # ------------------------------------------------------------------
+    # Drift detection (v0.1, rule-based — no LLM)
+    # ------------------------------------------------------------------
+
+    # Inversion pairs: if new content has word A and candidate has word B (or vice-versa)
+    # → flag as contradiction.
+    _INVERSION_PAIRS: list[tuple[str, str]] = [
+        ("always", "never"),
+        ("yes", "no"),
+        ("present", "absent"),
+        ("exists", "missing"),
+        ("works", "broken"),
+        ("supported", "unsupported"),
+        ("enabled", "disabled"),
+        ("required", "optional"),
+        ("true", "false"),
+    ]
+
+    # Qualifier words: if either text contains one → skip (soft contradiction)
+    _QUALIFIERS: set[str] = {
+        "maybe", "sometimes", "often", "partial", "partially", "mostly",
+    }
+
+    @staticmethod
+    def _tokenize(text: str) -> set[str]:
+        """Lowercase-split text on non-word characters; return set of tokens."""
+        import re
+        return set(re.findall(r"[a-z]+", text.lower()))
+
+    def _detect_contradictions(
+        self,
+        new_id: str,
+        content: str,
+        project: Optional[str],
+        tags: list[str],
+    ) -> list[str]:
+        """
+        Detect keyword-inversion contradictions between the new memory and recent
+        memories in the same project with overlapping tags.
+
+        Inserts rows into the `contradictions` table for each conflict found.
+        Returns list of conflicting memory IDs (empty if none).
+        """
+        if not tags:
+            return []
+
+        new_tokens = self._tokenize(content)
+
+        # Skip detection if new content has a qualifier word
+        if new_tokens & self._QUALIFIERS:
+            return []
+
+        # Build tag-overlap condition (any tag in common)
+        # We search raw JSON strings — good enough for v0.1
+        tag_conditions = " OR ".join(["tags LIKE ?" for _ in tags])
+        tag_params: list = [f'%"{t}"%' for t in tags]
+
+        # Project match: both NULL → match, both same value → match
+        if project is None:
+            project_condition = "project IS NULL"
+            project_params: list = []
+        else:
+            project_condition = "project = ?"
+            project_params = [project]
+
+        query = f"""
+            SELECT id, content FROM memories
+            WHERE ({tag_conditions})
+              AND {project_condition}
+              AND transaction_time >= datetime('now', '-30 days')
+              AND id != ?
+        """
+        params = tag_params + project_params + [new_id]
+
+        try:
+            candidates = self.conn.execute(query, params).fetchall()
+        except sqlite3.OperationalError:
+            # transaction_time column may not exist on very old DBs
+            return []
+
+        conflicts: list[str] = []
+        for (cand_id, cand_content) in candidates:
+            cand_tokens = self._tokenize(cand_content)
+
+            # Skip if candidate has a qualifier
+            if cand_tokens & self._QUALIFIERS:
+                continue
+
+            # Check inversion pairs in both directions
+            flagged = False
+            for (word_a, word_b) in self._INVERSION_PAIRS:
+                if (word_a in new_tokens and word_b in cand_tokens) or \
+                   (word_b in new_tokens and word_a in cand_tokens):
+                    flagged = True
+                    break
+
+            if flagged:
+                contra_id = _generate_id()
+                try:
+                    self.conn.execute(
+                        """INSERT INTO contradictions
+                           (id, memory_a_id, memory_b_id)
+                           VALUES (?, ?, ?)""",
+                        (contra_id, cand_id, new_id),
+                    )
+                    self.conn.commit()
+                except sqlite3.IntegrityError:
+                    pass  # Duplicate; ignore
+                conflicts.append(cand_id)
+
+        return conflicts
+
+    def get_contradictions(self, mem_id: str) -> list[str]:
+        """
+        Return list of memory IDs that are recorded as contradicting `mem_id`.
+
+        Looks in both directions of the contradictions table.
+        """
+        rows = self.conn.execute(
+            """SELECT memory_a_id, memory_b_id FROM contradictions
+               WHERE memory_a_id = ? OR memory_b_id = ?""",
+            (mem_id, mem_id),
+        ).fetchall()
+
+        result: list[str] = []
+        for (a, b) in rows:
+            other = b if a == mem_id else a
+            result.append(other)
+        return result
 
     def close(self):
         """Close the database connection."""

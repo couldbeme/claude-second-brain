@@ -78,6 +78,12 @@ def hybrid_search(
         importance_boost = 1.0 + (importance - 5) * 0.02
         combined_score *= importance_boost
 
+        # Multiply by confidence (NULL → treat as 0.75)
+        confidence = entry.get("confidence")
+        if confidence is None:
+            confidence = 0.75
+        combined_score *= confidence
+
         merged.append({
             "id": mem_id,
             "content": entry.get("content", ""),
@@ -86,6 +92,7 @@ def hybrid_search(
             "project": entry.get("project"),
             "tags": entry.get("tags", []),
             "importance": importance,
+            "confidence": confidence,
             "score": round(combined_score, 4),
             "vector_score": round(vec_score, 4),
             "keyword_score": round(kw_score, 4),
