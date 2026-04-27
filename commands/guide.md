@@ -187,7 +187,7 @@ After recommending a workflow:
 If the user asked for a tour, give them this quick overview:
 
 ```
-Welcome to the Claude Code Team Toolkit! Here's what you have:
+Welcome to the Claude Second Brain! Here's what you have:
 
 ORIENT — understand before you build
   /status          Where am I? What's in flight?

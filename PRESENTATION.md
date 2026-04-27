@@ -1,4 +1,4 @@
-# Claude Code Team Toolkit
+# Claude Second Brain
 ## Team Presentation
 
 ### How to use this deck
@@ -11,7 +11,7 @@ Speaker notes are in `> SPEAKER NOTES:` blocks under each slide.
 
 <!-- Slide 1: Title -->
 
-# Claude Code Team Toolkit
+# Claude Second Brain
 
 **22 Slash Commands. 17 Specialized Agents. One Consistent Workflow.**
 

@@ -22,7 +22,7 @@ The toolkit includes a memory MCP server (`memory-mcp/`) that gives Claude Code 
 - Syncs between developer's own machines via private git remote
 - Launchd agent runs hourly backup
 
-**Team Toolkit** (public/org repo)
+**Claude Second Brain** (public/org repo)
 - 24 slash commands, 17 agents
 - Memory MCP server implementation (`memory-mcp/`)
 - Install scripts, documentation

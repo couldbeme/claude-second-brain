@@ -24,7 +24,7 @@
 #   1. Verifies prerequisites (git, python, claude)
 #   2. Sets up SSH config for custom GIT_HOST (only if GIT_HOST != github.com)
 #   3. Clones the second brain as ~/.claude/
-#   4. Clones the toolkit repo to ~/Dev/claude-code-team-toolkit/
+#   4. Clones the toolkit repo to ~/Dev/claude-second-brain/
 #   5. Runs the toolkit installer (symlinks commands/agents/MCP into ~/.claude/)
 #   6. Fixes absolute paths in settings.json for this machine
 #   7. Creates the memory directory + verifies the MCP server
@@ -37,9 +37,9 @@ set -euo pipefail
 # GIT_HOST: override for multi-account SSH setups (e.g. github.com-personal)
 GIT_HOST="${GIT_HOST:-github.com}"
 SECOND_BRAIN_REPO="git@${GIT_HOST}:couldbeme/second-brain.git"
-TOOLKIT_REPO="git@${GIT_HOST}:couldbeme/claude-code-team-toolkit.git"
+TOOLKIT_REPO="git@${GIT_HOST}:couldbeme/claude-second-brain.git"
 CLAUDE_DIR="$HOME/.claude"
-TOOLKIT_DIR="$HOME/Dev/claude-code-team-toolkit"
+TOOLKIT_DIR="$HOME/Dev/claude-second-brain"
 AUTO=false
 CHECK_ONLY=false
 

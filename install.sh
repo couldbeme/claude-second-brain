@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# install.sh — Install/sync Claude Code Team Toolkit to ~/.claude/
+# install.sh — Install/sync Claude Second Brain to ~/.claude/
 #
 # Usage:
 #   ./install.sh            Full install (first time or re-sync)
@@ -252,7 +252,7 @@ run_migration() {
 
     # Step 3: Update .gitignore
     info "Updating second-brain .gitignore..."
-    local ignore_marker="# Toolkit-managed (symlinks to claude-code-team-toolkit)"
+    local ignore_marker="# Toolkit-managed (symlinks to claude-second-brain)"
     if ! grep -q "$ignore_marker" "$gitignore" 2>/dev/null; then
         cat >> "$gitignore" << IGNORE
 
@@ -291,7 +291,7 @@ IGNORE
 # =============================================================================
 
 echo ""
-printf "${CYAN}Claude Code Team Toolkit Installer${RESET}\n"
+printf "${CYAN}Claude Second Brain Installer${RESET}\n"
 echo "===================================="
 echo "Toolkit: $TOOLKIT_DIR"
 echo "Target:  $CLAUDE_DIR"

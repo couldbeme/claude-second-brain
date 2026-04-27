@@ -1,4 +1,4 @@
-# Claude Code Team Toolkit
+# Claude Second Brain
 
 25 slash commands + 17 specialized agents for [Claude Code](https://docs.anthropic.com/en/docs/claude-code) that enforce consistent, high-quality development workflows.
 
@@ -8,8 +8,8 @@
 
 ```bash
 # 1. Clone
-git clone <repo-url> claude-code-team-toolkit
-cd claude-code-team-toolkit
+git clone <repo-url> claude-second-brain
+cd claude-second-brain
 
 # 2. Install (symlinks + memory-mcp venv + git hook)
 ./install.sh

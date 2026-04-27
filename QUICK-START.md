@@ -8,8 +8,8 @@ Get from zero to productive in 5 minutes.
 
 ```bash
 # 1. Clone the toolkit
-git clone <repo-url> claude-code-team-toolkit
-cd claude-code-team-toolkit
+git clone <repo-url> claude-second-brain
+cd claude-second-brain
 
 # 2. Run the installer
 ./install.sh

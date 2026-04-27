@@ -51,7 +51,7 @@
 ## Repository Relationship
 
 ```
-claude-code-team-toolkit/          (source of truth for code)
+claude-second-brain/          (source of truth for code)
 ├── commands/*.md                  ──symlink──►  ~/.claude/commands/*.md
 ├── agents/*.md                    ──symlink──►  ~/.claude/agents/*.md
 ├── memory-mcp/*.py                ──symlink──►  ~/.claude/memory-mcp/*.py

@@ -20,7 +20,7 @@ REMOVED=0
 PRESERVED=0
 
 echo ""
-printf "${CYAN}Claude Code Team Toolkit Uninstaller${RESET}\n"
+printf "${CYAN}Claude Second Brain Uninstaller${RESET}\n"
 echo "======================================"
 echo "Removing symlinks pointing to: $TOOLKIT_DIR"
 echo "Preserving: personal files, memory.db, settings.json, CLAUDE.md"

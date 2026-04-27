@@ -1,4 +1,4 @@
-# Claude Code Team Toolkit
+# Claude Second Brain
 
 ### 24 Slash Commands + 17 Agents for High-Quality Development
 

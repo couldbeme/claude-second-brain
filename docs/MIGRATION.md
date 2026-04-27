@@ -19,7 +19,7 @@ If you previously installed the toolkit with `cp -r`, this guide migrates you to
 ## Quick migration (recommended)
 
 ```bash
-cd /path/to/claude-code-team-toolkit
+cd /path/to/claude-second-brain
 ./install.sh --migrate
 ```
 
@@ -58,7 +58,7 @@ git rm --cached memory-mcp/server.py memory-mcp/db.py memory-mcp/embeddings.py \
 Add these lines to `~/.claude/.gitignore`:
 
 ```gitignore
-# Toolkit-managed (symlinks to claude-code-team-toolkit)
+# Toolkit-managed (symlinks to claude-second-brain)
 agents/*.md
 commands/*.md
 memory-mcp/*.py
@@ -85,7 +85,7 @@ rm ~/.claude/memory-mcp/server.py ~/.claude/memory-mcp/db.py \
 ### Step 5: Run the installer
 
 ```bash
-cd /path/to/claude-code-team-toolkit
+cd /path/to/claude-second-brain
 ./install.sh
 ```
 
@@ -94,11 +94,11 @@ cd /path/to/claude-code-team-toolkit
 ```bash
 # Should show symlink arrows
 ls -la ~/.claude/agents/architect.md
-# architect.md -> /path/to/claude-code-team-toolkit/agents/architect.md
+# architect.md -> /path/to/claude-second-brain/agents/architect.md
 
 # Memory-MCP should resolve to repo version
 ls -la ~/.claude/memory-mcp/server.py
-# server.py -> /path/to/claude-code-team-toolkit/memory-mcp/server.py
+# server.py -> /path/to/claude-second-brain/memory-mcp/server.py
 
 # Open Claude Code and test
 # /guide tour
@@ -120,7 +120,7 @@ If something goes wrong:
 
 ```bash
 # Remove all toolkit symlinks, keep personal files
-cd /path/to/claude-code-team-toolkit
+cd /path/to/claude-second-brain
 ./uninstall.sh
 
 # Go back to manual copy

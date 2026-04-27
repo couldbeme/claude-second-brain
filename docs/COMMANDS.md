@@ -1,6 +1,6 @@
 # Command Reference
 
-Full reference for all 24 slash commands in the Claude Code Team Toolkit.
+Full reference for all 24 slash commands in the Claude Second Brain.
 
 ---
 

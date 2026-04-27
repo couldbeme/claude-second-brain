@@ -1,11 +1,11 @@
 ---
-description: Sync a new or updated skill to the claude-code-team-toolkit docs
+description: Sync a new or updated skill to the claude-second-brain docs
 argument-hint: skill name (e.g., "flag") or "all" to sync everything
 ---
 
-# Sync Skill Documentation to Team Toolkit
+# Sync Skill Documentation to Claude Second Brain
 
-When a new skill (slash command or agent) is created or updated in `~/.claude/commands/` or `~/.claude/agents/`, this workflow syncs it to the `claude-code-team-toolkit` repo with proper documentation updates.
+When a new skill (slash command or agent) is created or updated in `~/.claude/commands/` or `~/.claude/agents/`, this workflow syncs it to the `claude-second-brain` repo with proper documentation updates.
 
 ## Input
 
@@ -13,14 +13,14 @@ Skill: $ARGUMENTS
 
 ## Pre-flight
 
-1. Verify the toolkit repo exists at `~/Dev/claude-code-team-toolkit`
+1. Verify the toolkit repo exists at `~/Dev/claude-second-brain`
 2. Verify the skill file exists in `~/.claude/commands/{name}.md` or `~/.claude/agents/{name}.md`
 3. Check current git state of the toolkit repo (branch, clean?)
 
 ## Phase 1: Create a Branch
 
 ```bash
-cd ~/Dev/claude-code-team-toolkit
+cd ~/Dev/claude-second-brain
 git checkout main && git pull your-org main
 git checkout -b docs/add-{skill-name}-skill
 ```
@@ -89,7 +89,7 @@ Only if the skill involves multi-step usage or combines with other skills. Add a
 
 ## Phase 4: Verify
 
-- Run any existing tests: `cd ~/Dev/claude-code-team-toolkit && source .venv/bin/activate && python -m pytest tests/ -q`
+- Run any existing tests: `cd ~/Dev/claude-second-brain && source .venv/bin/activate && python -m pytest tests/ -q`
 - Verify markdown formatting: no broken tables, no orphan links
 - Count total commands and agents — ensure README numbers match actual file counts
 
