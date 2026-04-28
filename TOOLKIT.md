@@ -17,7 +17,6 @@ This toolkit codifies engineering best practices into repeatable, quality-enforc
 | **[PLAYBOOK.md](PLAYBOOK.md)** | Daily workflow recipes, prompt patterns, agent composition, AI/LLM security |
 | **[docs/COMMANDS.md](docs/COMMANDS.md)** | Full reference for all 27 commands |
 | **[docs/AGENTS.md](docs/AGENTS.md)** | Full reference for all 17 agents |
-| **[docs/SELF-LEARNING.md](docs/SELF-LEARNING.md)** | CLAUDE.md workflow + 5-layer learning system |
 | **[docs/ADVANCED-PATTERNS.md](docs/ADVANCED-PATTERNS.md)** | Skills crystallization, context recovery, post-audit remediation |
 | **[docs/PURPOSE.md](docs/PURPOSE.md)** | Public/private boundary — what each subtree IS and IS NOT for |
 | **[SETUP-MEMORY.md](SETUP-MEMORY.md)** | Memory system installation -- LM Studio, MCP server, hybrid search |
