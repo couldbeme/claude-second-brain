@@ -2,7 +2,7 @@
 
 **Version:** v0.1 draft
 **Scope:** Pre-compact dump + `/resume` skill + session-bridge journal
-**Status:** L1: shipped (commit `74ef573`) | Design phase closed
+**Status:** L1: shipped (commit `74ef573`) | L1.5: shipped (commit `c7f4697`) | Design phase closed
 
 ---
 
