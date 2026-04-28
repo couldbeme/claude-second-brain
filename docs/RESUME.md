@@ -124,7 +124,7 @@ Each is a one-line index entry — Claude reads the file content only when relev
 - `~/.claude/checkpoint.md`
 - All git commits in both repos
 - Skills + commands (file-system live; symlinks)
-- 38 rows in `memory.db` (20 company-x-recovered + 18 auto-memory ingested)
+- Rows in `memory.db` reflect prior import plus auto-memory ingestion
 
 **NOT preserved (lost on /compact):**
 - The conversational threading — the *reasoning chain* between decisions

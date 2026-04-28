@@ -34,12 +34,11 @@ DEFAULT_STALE_PATTERNS = [
     "claude-code-team-toolkit",
     "Claude Code Team Toolkit",
     "Team Toolkit",
-    "user-handle",
-    "company-x",
-    "teammate-a",
-    "teammate-b",
-    "couldbeme",
 ]
+# Project-specific patterns (private identities, prior org names, deprecated handles)
+# should be loaded from a user-controlled file at:
+#   ~/.claude/leak-patterns.txt   (one pattern per line; not tracked by git)
+# This keeps the public default list free of personal/internal references.
 EXPECTED_AUDIT_COLS = 9
 
 # Regex for path:line references. Requires an extension (so we don't match
