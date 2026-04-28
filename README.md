@@ -1,64 +1,123 @@
 # Claude Second Brain
 
-27 slash commands + 17 specialized agents for [Claude Code](https://docs.anthropic.com/en/docs/claude-code) that enforce consistent, high-quality development workflows — plus a memory system that lets Claude actually remember across sessions.
+A safety-first workflow toolkit for [Claude Code](https://docs.anthropic.com/en/docs/claude-code): 27 slash commands + 17 agents that enforce predictable, auditable, quality-gated development — plus a local memory system that persists across sessions.
 
-**New here?** Jump to [QUICK-START.md](QUICK-START.md) for install + a hands-on walkthrough. Or peek at [docs/METAPROMPT-EXAMPLES.md](docs/METAPROMPT-EXAMPLES.md) to see how `/metaprompt` upskills a fuzzy 15-word ask into a 400-word structured execution plan — the toolkit's most novel capability and the fastest "wait, what" moment.
+**Before anything else:** `/metaprompt` turns a vague ask into a structured execution plan a senior engineer would write. Here is what that looks like.
 
-## Quick Start
+---
 
-```bash
-# 1. Clone
-git clone <repo-url> claude-second-brain
-cd claude-second-brain
+## What `/metaprompt` does (BEFORE/AFTER)
 
-# 2. Install (symlinks + memory-mcp venv + git hook)
-./install.sh
+**BEFORE** — what you type without it:
 
-# 3. Set up the memory system (see SETUP-MEMORY.md)
-
-# 4. Open Claude Code in any project and try:
-#    /guide tour                  # new? start here
-#    /status
-#    /explain src/
-#    /tdd Add input validation
+```
+/metaprompt I need a recap on what's built, what's not built, what we're
+doing next, and suggestions for the next steps
 ```
 
-Updates auto-sync on `git pull` via post-merge hook. Personal agents go in `~/.claude/agents/` as regular files — never touched by updates. See [QUICK-START.md](QUICK-START.md) for full details.
+**AFTER** — the structured prompt it produces:
 
-## Documentation
+```markdown
+# Mission
+Tight one-screen recap. Three sections, each ≤200 words: BUILT, NOT BUILT, NEXT.
+Reader re-orients in <60 seconds.
 
-| Doc | What it covers |
-|-----|----------------|
-| **[QUICK-START.md](QUICK-START.md)** | Install guide + "Your First 5 Minutes" walkthrough + hands-on sandbox |
-| **[TOOLKIT.md](TOOLKIT.md)** | Why the toolkit matters — 9 Before & After scenarios |
-| **[PLAYBOOK.md](PLAYBOOK.md)** | Daily workflow recipes, prompt patterns, agent composition, AI/LLM security |
-| **[docs/TOP-COMMANDS.md](docs/TOP-COMMANDS.md)** | Top 10 commands cheat sheet with examples + decision tree |
-| **[docs/COMMANDS.md](docs/COMMANDS.md)** | Full reference for all 27 commands |
-| **[docs/AGENTS.md](docs/AGENTS.md)** | Full reference for all 17 agents |
-| **[docs/SELF-LEARNING.md](docs/SELF-LEARNING.md)** | CLAUDE.md workflow + 5-layer learning system |
-| **[docs/ADVANCED-PATTERNS.md](docs/ADVANCED-PATTERNS.md)** | Skills crystallization, context recovery, post-audit remediation |
-| **[docs/PURPOSE.md](docs/PURPOSE.md)** | Public/private boundary — what each subtree IS and IS NOT for |
-| **[docs/TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md)** | Common issues + Security & Portability env-var reference |
-| **[SETUP-MEMORY.md](SETUP-MEMORY.md)** | Memory system installation — LM Studio, MCP server, hybrid search |
-| **[CLAUDE.md.template](CLAUDE.md.template)** | Global rules template — TDD, security, self-learning protocol |
-| **[docs/FIRST-10-MINUTES.md](docs/FIRST-10-MINUTES.md)** | Onboarding extension — carries QUICK-START's 5-min tour to 10 min |
-| **[docs/CONTINUITY-RESUME-DEMO.md](docs/CONTINUITY-RESUME-DEMO.md)** | Hands-on continuity demo — bridge journal, PreCompact snapshot, `/resume` |
-| **[docs/OSS-ADOPTION-CHECKLIST.md](docs/OSS-ADOPTION-CHECKLIST.md)** | 7-question fit-check — should you use this toolkit? |
+# Phases
+1. Comprehensive scan: active repos `git log --oneline -20`,
+   checkpoint.md, TaskList, recent feedback memories, in-flight agents.
+2. Classify: Built = landed+committed; Not Built = queued OR declined-with-reason;
+   Next = user-priority → dependency → ship-cost-vs-value.
+3. Deliver in exact format below.
 
-Start with **QUICK-START.md** to get set up. Read **TOOLKIT.md** to see why it matters. Use **PLAYBOOK.md** as a daily reference.
+# Format
+## ✓ Built — [artifact, where it lives, why]
+## ⏳ Not built / queued — [item, reason]
+## ▶ Next (ranked) — [verb + concrete artifact + estimate + dependency]
+**Recommend:** [single highest-leverage move, one-sentence rationale]
 
-## What's Included
+# Constraints
+- ≤600 words. Trim "Built" first if over.
+- ONE consolidated recap; no section-by-section pinging.
+- Include 1 honest-decline if any framing was refused.
+```
+
+The AFTER adds a format, a word budget, priority-ranking criteria, and an honesty requirement. The BEFORE relies on Claude inferring all of that — and it usually doesn't. Five more real transformations: [docs/METAPROMPT-EXAMPLES.md](docs/METAPROMPT-EXAMPLES.md).
+
+---
+
+## Why this exists
+
+Autonomous coding agents have documented failure modes: uncontrolled file operations, supply-chain attacks via malicious skills, agents acting on prompt injections without user gates, in-flight tasks lost when context compaction fires. The failure pattern is not the model — it is the absence of enforcement layers between a fuzzy instruction and an irreversible action.
+
+This toolkit adds enforcement without infrastructure. Every safety property uses Claude Code primitives that already exist on your machine: CLAUDE.md rules, Python hooks, plan-mode reliance, and append-only log files. No binary, no Docker-per-session, no policy server, no pip dependency beyond the memory system's optional LM Studio backend.
+
+---
+
+## The 5 safety primitives shipped by default
+
+**1. Plan-mode-first.** Non-trivial changes run through Claude Code's built-in plan mode. The model proposes; you approve; then it executes. Speculative edits require an explicit gate.
+- Enforced via: CLAUDE.md template rule ("Plan first") + `/orchestrate` and `/team` approval prompts before Layer 1 executes.
+
+**2. Append-only audit journal.** Every structural decision Claude makes during a session is written to `session_bridge.md` with an ISO-8601 timestamp. The file is append-only — no entry is ever rewritten or deleted.
+- Enforced via: `memory-mcp/continuity_dump.py::append_bridge_entry()` — `fcntl.LOCK_EX` on append, 500-char payload cap, newline stripping to preserve one-entry-per-line invariant.
+
+**3. Validation gates between agent dispatches.** In `/team` workflows, a `code-reviewer` and `verification-agent` run after implementation agents and before any commit. The pipeline does not advance unless the gate passes.
+- Enforced via: layer-strict execution in `commands/team.md` (Phase 0.5 → 4) — Layer N+1 cannot start until Layer N returns.
+
+**4. Privacy floor (metadata-only continuity).** At context compaction, the pre-compact snapshot reads `session_bridge.md` entries only — structured metadata Claude wrote, never `.jsonl` transcript bodies, never message content.
+- Enforced via: `memory-mcp/continuity_dump.py` docstring contract ("NEVER reads transcript message bodies") + `_read_bridge_entries()` which opens only `bridge_path`, never `transcript_path`.
+
+**5. Truthfulness rule (workflow norm).** Every novelty claim requires a verifiable code path or concrete comparison before shipping. No marketing-speak.
+- Enforced via: `/metaprompt` structures fuzzy asks into phased, format-constrained prompts before any agent dispatches; `code-reviewer` and `verification-agent` validate diffs against checklist criteria before commit.
+
+---
+
+## Common agent-attack categories — coverage
+
+Six of seven common agent-attack categories are addressed by existing primitives. The seventh (jailbreaking across models) is out of scope — this toolkit is single-model, Claude-only.
+
+| Attack category | Defense (verifiable) |
+|---|---|
+| Prompt injection (direct / indirect / cross-agent) | Plan mode gates execution; `/metaprompt` structures fuzzy asks; privacy floor blocks injected content via memory |
+| Tool abuse / privilege escalation | No-auto-push rule in CLAUDE.md; path-traversal guards in `bridge_append.py` + `precompact_hook.py::_resolve_memory_dir()` |
+| Context/memory poisoning | Append-only bridge journal; confidence + visibility controls in `memory-mcp/db.py`; metadata-only continuity dump; truthfulness rule |
+| Identity spoofing (agent-to-agent) | ISO-8601 timestamps on all bridge entries; single-orchestrator pattern — no direct agent-to-agent channel |
+| Data exfiltration via side channels | Stop-hook safety (no stdout writes in hooks); 500-char payload cap in `continuity_dump.py::_MAX_PAYLOAD_LEN`; local-only `memory.db`; metadata-only writes |
+| Trust boundary violations | Plan mode = explicit approval gate; bridge journal append-only = audit unevadable |
+| Jailbreaking across models | Out of scope — single-model, Claude-only |
+
+Categories drawn from common offensive-security taxonomies for AI agents (prompt injection, tool abuse, memory poisoning, identity spoofing, exfiltration, trust-boundary violations, jailbreaking).
+
+---
+
+## How this differs from adjacent toolkits
+
+**[everything-claude-code](https://github.com/affaan-m/everything-claude-code)** (affaan-m) — Claude Code native, lightweight, large community. Autonomy-first; AgentShield is a sub-feature you opt into. We lead with safety as the organizing narrative, not a module.
+
+**[Chachamaru127/claude-code-harness](https://github.com/Chachamaru127/claude-code-harness)** — Go binary, R01-R13 declarative rules, Plan→Work→Review autonomy loop. Pitched as agentic autonomy. We add no binary — every enforcement property uses Claude Code's own primitives.
+
+**[OpenClaw](https://github.com/openclaw/openclaw)** — widely deployed, large ecosystem. Also the source of the documented failures cited above (CVE surface, supply-chain exposure, government bans). We are not a fork of it.
+
+**Lovable / Bolt / Rork** — hosted, UI-first, no-code target audience. Different category. If you are using Claude Code directly, those tools don't apply.
+
+The specific delta we can defend: safety-first narrative + zero-infrastructure enforcement + codified truthfulness/privacy floor as named, versioned properties. Others may have some of these; none document all three as first-class, verifiable constraints.
+
+---
+
+## What's included
+
+This is a starter library. Agents are not a fixed catalog — `/orchestrate` and `/team` compose them dynamically per task using Claude Code's Agent tool. Your own agents go in `~/.claude/agents/` and are never touched by updates.
 
 ### Commands (27)
 
-| Command | Description |
+| Command | What it does |
 |---------|-------------|
-| `/status` | Instant progress report -- git state, tests, next steps |
+| `/status` | Instant progress report — git state, tests, next steps |
 | `/explain` | 3-level code explainer with ASCII data flow diagrams |
 | `/tdd` | Strict red-green-refactor TDD cycle |
 | `/verify` | 7-step health check with traffic-light report |
 | `/commit-push-pr` | Quality-gated commit, push, and PR workflow |
-| `/document` | Generate or update docs -- always shows diffs |
+| `/document` | Generate or update docs — always shows diffs |
 | `/new-project` | Scaffold a project with CLAUDE.md template |
 | `/learn` | Capture learnings into CLAUDE.md |
 | `/recall` | Search project knowledge (CLAUDE.md, docs, code) |
@@ -66,86 +125,76 @@ Start with **QUICK-START.md** to get set up. Read **TOOLKIT.md** to see why it m
 | `/gap-analysis` | Find missing tests, docs, error handling, types |
 | `/research` | Deep 3-track technical research with sources |
 | `/orchestrate` | Multi-agent task decomposition and execution |
-| `/metaprompt` | Upskill a fuzzy task description into a phased, quality-gated, executable prompt |
+| `/metaprompt` | Upskill a fuzzy task into a phased, quality-gated, executable prompt |
 | `/sync-memories` | Export/import knowledge between machines |
-| `/guide` | Interactive toolkit assistant -- suggests commands and workflows for your task |
-| `/diagnose` | Interpret error screenshots, logs, or stack traces and diagnose + fix |
-| `/scan` | Full repository health scan -- security, quality, gaps, and operational health in one report |
-| `/flag` | Flag findings for team review instead of fixing them unilaterally |
+| `/guide` | Interactive toolkit assistant — suggests commands for your task |
+| `/diagnose` | Interpret error screenshots, logs, or stack traces and fix |
+| `/scan` | Full repository health scan — security, quality, gaps, operational health |
+| `/flag` | Flag findings for team review instead of fixing unilaterally |
 | `/resolve-pr` | Fetch PR review comments, fix code, reply politely, push |
 | `/sync-skill-docs` | Sync new skills to the team toolkit repo with documentation updates |
-| `/team` | Dynamic agent team assembly -- analyzes project, selects optimal agents, executes in layers |
+| `/team` | Analyze project + assemble optimal agent team, execute in layers |
 | `/harden-memory` | Audit and harden the memory auto-sync pipeline end-to-end |
 | `/economy` | Optimize token consumption while maintaining result quality |
 | `/context-save` | Checkpoint task state to survive context compaction |
+| `/idea` | Capture a side-idea instantly without breaking current task flow |
+| `/ideas` | View, prioritize, and manage the captured ideas backlog |
 
-### Agents (17)
+### Agents (17, starter library)
 
-**Role-Based Agents (7):**
+**Role-based (7):** `architect`, `tdd-agent`, `security-auditor`, `code-reviewer`, `documentation-agent`, `research-agent`, `verification-agent`
 
-| Agent | Role |
-|-------|------|
-| **architect** | Design implementation blueprints from codebase patterns |
-| **tdd-agent** | Strict TDD implementation (never codes before tests) |
-| **security-auditor** | Vulnerability scanning with severity ratings |
-| **code-reviewer** | Confidence-scored bug and issue detection |
-| **documentation-agent** | Accurate, concise doc generation |
-| **research-agent** | Multi-source technical investigation |
-| **verification-agent** | Sequential test/lint/build pipeline |
+**Domain expert (10):** `senior-frontend-dev`, `senior-backend-dev`, `senior-fullstack-dev`, `senior-data-scientist`, `ml-engineer`, `devops-engineer`, `database-engineer`, `performance-engineer`, `sre-agent`, `qa-strategist`
 
-**Domain Expert Agents (10):**
+Full reference: [docs/AGENTS.md](docs/AGENTS.md)
 
-| Agent | Seniority | Domain |
-|-------|-----------|--------|
-| **senior-frontend-dev** | 15+ years | React/Vue/Angular, accessibility, Core Web Vitals |
-| **senior-backend-dev** | 15+ years | API design, databases, caching, auth |
-| **senior-fullstack-dev** | 15+ years | End-to-end features, vertical slices |
-| **senior-data-scientist** | 12+ years | ML, statistics, experiment design |
-| **ml-engineer** | 12+ years | MLOps, model serving, pipelines |
-| **devops-engineer** | 12+ years | CI/CD, Docker, K8s, Terraform |
-| **database-engineer** | 15+ years | Schema, query optimization, migrations |
-| **performance-engineer** | 12+ years | Profiling, load testing, benchmarking |
-| **sre-agent** | 12+ years | Incident response, SLO management |
-| **qa-strategist** | 12+ years | Test strategy, contract testing |
-
-### Memory System
-
-Persistent knowledge base that lets Claude Code remember across sessions. Uses local embeddings (LM Studio + nomic-embed-text) and hybrid search (70% semantic + 30% keyword).
-
-- **LM Studio is optional** -- without it, search falls back to keyword-only (the memory system itself is required)
-- **See [SETUP-MEMORY.md](SETUP-MEMORY.md)** for installation guide
-- **`memory-mcp/continuity_dump.py`** — writes a content-rich pre-compact snapshot (`continuity_pre_compact_<id>.md`) capturing decisions, open threads, in-flight state, and voice signals from the current session; invoked automatically by the PreCompact hook alongside the token-metric snapshot. Privacy: reads only `session_bridge.md` — never touches transcript bodies.
-- **`memory-mcp/bridge_append.py`** — CLI that Claude invokes during a session to append structural entries (`DECISION`, `INFLIGHT`, `THREAD-OPEN`, `THREAD-CLOSE`) to `session_bridge.md`. The PreCompact hook then dumps these entries into the continuity snapshot. Trigger taxonomy in `CLAUDE.md.template` rule 8; setup in [SETUP-MEMORY.md](SETUP-MEMORY.md) Step 6.
-- **`session_threads` DB table** — optional SQLite table in `memory.db` for durable cross-session thread tracking (open/closed/deferred); schema defined in `memory-mcp/db.py`.
-
-## Your First 5 Minutes
-
-```
-/guide tour                          # see everything available
-/status                              # where am I? what's in flight?
-/tdd Add input validation to signup  # build something with TDD
-/verify                              # full health check
-/learn from session                  # save what you discovered
-```
-
-For a detailed walkthrough with expected outputs, see **[QUICK-START.md](QUICK-START.md)**. To practice on real (intentionally buggy) code, try the **[sandbox](examples/sandbox/)**.
-
-## How It Works
-
-**Slash commands** are markdown files with YAML frontmatter. Type `/command-name` in Claude Code and it follows the structured workflow inside.
-
-```yaml
----
-description: What shows in the autocomplete menu
-argument-hint: Placeholder text for the argument
 ---
 
-# Workflow instructions here...
+## Try it now
+
+```bash
+git clone <repo-url> claude-second-brain
+cd claude-second-brain
+./install.sh
 ```
 
-**Agents** are dispatched automatically by commands like `/orchestrate` and `/audit`. They run as focused subprocesses with specific tools and return structured results.
+Then in Claude Code:
 
-**CLAUDE.md** is a project-level file that Claude Code reads at session start. It stores commands, architecture notes, domain rules, and gotchas -- persistent context across sessions.
+```
+/guide tour         # see what's available
+/status             # where am I, what's in flight?
+/tdd Add input validation to signup form
+```
+
+`/guide tour` lists every command with a one-line description. `/status` takes ~5 seconds and prevents working on stale state. `/tdd` enforces red-green-refactor — tests first, always.
+
+Install sets up command symlinks, the memory-mcp venv, and the PreCompact git hook. The memory system itself requires [SETUP-MEMORY.md](SETUP-MEMORY.md) (optional LM Studio for semantic search; falls back to keyword-only without it). Set aside 5 minutes: [QUICK-START.md](QUICK-START.md).
+
+---
+
+## Documentation
+
+| Doc | What it covers |
+|-----|----------------|
+| **[QUICK-START.md](QUICK-START.md)** | Install guide + first 5-minute walkthrough + hands-on sandbox |
+| **[TOOLKIT.md](TOOLKIT.md)** | 9 BEFORE/AFTER scenarios — the workflow difference in practice |
+| **[PLAYBOOK.md](PLAYBOOK.md)** | Daily recipes, prompt patterns, agent composition, AI/LLM security |
+| **[docs/TOP-COMMANDS.md](docs/TOP-COMMANDS.md)** | Top 10 commands cheat sheet with examples + decision tree |
+| **[docs/COMMANDS.md](docs/COMMANDS.md)** | Full reference for all 27 commands |
+| **[docs/AGENTS.md](docs/AGENTS.md)** | Full reference for all 17 agents |
+| **[docs/ADVANCED-PATTERNS.md](docs/ADVANCED-PATTERNS.md)** | Skills crystallization, context recovery, post-audit remediation |
+| **[docs/PURPOSE.md](docs/PURPOSE.md)** | Public/private boundary — what each subtree is and is not for |
+| **[docs/TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md)** | Common issues + Security & Portability env-var reference |
+| **[SETUP-MEMORY.md](SETUP-MEMORY.md)** | Memory system installation — LM Studio, MCP server, hybrid search |
+| **[CLAUDE.md.template](CLAUDE.md.template)** | Global rules template — TDD, security, self-learning protocol |
+| **[docs/FIRST-10-MINUTES.md](docs/FIRST-10-MINUTES.md)** | Onboarding extension — carries the 5-minute tour to 10 minutes |
+| **[docs/CONTINUITY-RESUME-DEMO.md](docs/CONTINUITY-RESUME-DEMO.md)** | Hands-on continuity demo — bridge journal, PreCompact snapshot, `/resume` |
+| **[docs/OSS-ADOPTION-CHECKLIST.md](docs/OSS-ADOPTION-CHECKLIST.md)** | 7-question fit-check — should you use this toolkit? |
+| **[examples/MEMORY-WALKTHROUGH.md](examples/MEMORY-WALKTHROUGH.md)** | Memory system walkthrough with real output |
+| **[examples/RESOLVE-PR-WALKTHROUGH.md](examples/RESOLVE-PR-WALKTHROUGH.md)** | End-to-end PR resolution walkthrough |
+| **[examples/sandbox/CONTRADICTIONS-DEMO.md](examples/sandbox/CONTRADICTIONS-DEMO.md)** | 90-second hands-on: contradiction detection + self-learning firing live |
+
+---
 
 ## Contributing
 
@@ -155,6 +204,8 @@ Built a useful workflow? Add it:
 2. Include YAML frontmatter with `description:`
 3. Write clear, phased instructions
 4. Open a PR
+
+Personal commands and agents go in `~/.claude/commands/` and `~/.claude/agents/` — never touched by toolkit updates.
 
 ## License
 
