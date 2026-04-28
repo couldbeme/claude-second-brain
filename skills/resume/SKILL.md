@@ -77,3 +77,5 @@ Produce a single response with these sections (terse — match the user's prefer
 ## Implementation notes
 
 This is a *workflow skill* (no backing script). The skill body IS the workflow. Claude reads files per the list above and produces the summary structure. Compare to `/memory lint` and `/context-status` which both have backing Python scripts; `/resume` is pure prompt engineering applied to a fixed file set.
+
+Note: the bridge journal (`session_bridge.md`) is populated *during* a session by Claude itself via `memory-mcp/bridge_append.py` (a thin CLI wrapper Claude invokes through Bash). The `continuity_pre_compact_*.md` that `/resume` reads is built from what Claude wrote to the bridge — so the snapshot reflects Claude's own structural logging, not transcript content.
