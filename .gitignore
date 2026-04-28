@@ -15,7 +15,7 @@ personal/
 docs/LEXICON.md
 docs/LEXICON-*.md
 
-# Internal launch artifacts — research outputs, drafts, proposals, plans
+# Internal artifacts — drafts, proposals, plans, dev-backlog
 # Held in private archive at ~/.claude/projects/<slug>/memory/launch_archive/
 docs/launch/
 docs/efficacy/
@@ -30,3 +30,4 @@ docs/LANDSCAPE.md
 docs/METAPROMPT-REFRAME.md
 docs/BENCHMARK-LANDSCAPE.md
 docs/BENCHMARK-PLAN.md
+BACKLOG.md
