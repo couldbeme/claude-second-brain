@@ -2,6 +2,8 @@
 
 A small Python app with **5 intentional issues** for you to find and fix using the toolkit.
 
+**See also:** [CONTRADICTIONS-DEMO.md](CONTRADICTIONS-DEMO.md) — a separate 90-second walkthrough showing the contradictions table firing in real time + self-learning Layer 1/2/3 in action. Different demo shape; both are runnable in a fresh REPL.
+
 ## The Issues
 
 | # | Type | Severity | Hint |
@@ -21,7 +23,7 @@ cd examples/sandbox/
 /scan
 ```
 
-The scan finds all 4 issues and produces a prioritized report. You'll see the security issue flagged as critical and the missing tests as a coverage gap.
+The scan finds all 5 issues and produces a prioritized report. You'll see the security issues flagged as critical and the missing tests as a coverage gap.
 
 ### Step 2: Fix the bug with TDD
 
@@ -75,7 +77,7 @@ Compare the before and after scorecards. You should see all critical issues reso
 
 ## Expected Results
 
-After fixing all 4 issues:
+After fixing all 5 issues:
 
 | Metric | Before | After |
 |--------|--------|-------|

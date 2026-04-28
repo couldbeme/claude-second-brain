@@ -2,7 +2,7 @@
 
 27 slash commands + 17 specialized agents for [Claude Code](https://docs.anthropic.com/en/docs/claude-code) that enforce consistent, high-quality development workflows — plus a memory system that lets Claude actually remember across sessions and a *Mythos pattern* for partnerships where the artifacts become the substrate.
 
-**New here?** Jump to [QUICK-START.md](QUICK-START.md) for install + a hands-on walkthrough.
+**New here?** Jump to [QUICK-START.md](QUICK-START.md) for install + a hands-on walkthrough. Or peek at [docs/METAPROMPT-EXAMPLES.md](docs/METAPROMPT-EXAMPLES.md) to see how `/metaprompt` upskills a fuzzy 15-word ask into a 400-word structured execution plan — the toolkit's most novel capability and the fastest "wait, what" moment.
 
 ## Quick Start
 

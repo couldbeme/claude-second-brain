@@ -401,6 +401,8 @@ Next time:
 
 This is the **prompt upskiller** — it closes the gap between fuzzy intention and structured execution plan. Saving it as a command is optional; using it immediately is the primary workflow.
 
+**Five real BEFORE/AFTER transformations** (recap, multi-agent rewrite, partnership-rule codification, security review, performance investigation): see [METAPROMPT-EXAMPLES.md](METAPROMPT-EXAMPLES.md). Each is annotated with what the AFTER catches that the BEFORE would miss.
+
 ### `/economy`
 
 **When to use:** When you want to optimize token consumption while maintaining result quality. Run at session start or when working on large codebases.

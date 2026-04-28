@@ -4,7 +4,7 @@
 
 Slash commands are reusable workflow prompts for Claude Code. Type `/command-name` and Claude follows a structured process instead of ad-hoc prompting. Agents are specialized subprocesses that handle focused tasks autonomously.
 
-This toolkit codifies engineering best practices into repeatable, quality-enforced workflows.
+This toolkit codifies engineering best practices into repeatable, quality-enforced workflows. The standout: `/metaprompt` upskills a fuzzy 15-word ask into a 400-word structured execution plan with phases, hard constraints, and a "done when" gate — the kind of prompt a senior engineer would write, without you being a prompt engineer. See [docs/METAPROMPT-EXAMPLES.md](docs/METAPROMPT-EXAMPLES.md) for five real BEFORE/AFTER transformations.
 
 ---
 

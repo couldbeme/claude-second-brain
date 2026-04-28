@@ -79,6 +79,74 @@ Recipes, prompt patterns, and agent composition strategies for common developmen
 /commit-push-pr                             # 5. Ship with confidence
 ```
 
+### Multi-Agent /team Workflows
+
+These three recipes show the `/team` skill in action. Each starts with a fuzzy goal and ends with a layered execution plan.
+
+#### Recipe 1: Add a complex feature with quality gates
+
+```
+/team Add Stripe subscription billing with webhooks, usage metering, and
+upgrade/downgrade flows
+```
+
+What `/team` produces (illustrative):
+
+```
+TEAM ASSEMBLY
+=============
+Project: e-commerce-app
+Stack: Python/FastAPI + React + Postgres
+Task type: Feature (multi-domain)
+Complexity: Complex
+
+PROPOSED TEAM (8 agents)
+
+LAYER 0 — Analysis (parallel):
+  [x] architect             — design billing module structure
+  [x] research-agent        — survey Stripe SDK patterns + webhook security
+
+LAYER 1 — Implementation (parallel):
+  [x] senior-backend-dev    — subscription CRUD + webhook handlers
+  [x] database-engineer     — schema + migrations
+  [x] tdd-agent             — tests for both code paths
+
+LAYER 2 — Review (parallel):
+  [x] security-auditor      — webhook signature verification, PCI surface
+  [x] code-reviewer         — bugs + style
+
+LAYER 3 — Documentation:
+  [x] documentation-agent   — API docs + integration guide
+
+LAYER 4 — Verification:
+  [x] verification-agent    — full pipeline (deps/lint/tests/build)
+
+Approve this plan? [yes]
+```
+
+Layer-strict execution: Layer N+1 never starts before Layer N completes. Conflicts in Layer 1 (two agents touching the same lines) are surfaced for resolution. Verification runs LAST. The whole flow takes ~15 min of your attention; agents do the rest.
+
+#### Recipe 2: Investigate a production-shaped concern
+
+```
+/team Investigate why p99 latency on /api/users spiked 3x last week
+```
+
+`/team` selects: `performance-engineer` (lead), `database-engineer` (DB query analysis), `sre-agent` (incident correlation), `code-reviewer` (recent diff scan). Layer 0 collects profiler output and reviews recent commits in parallel. Layer 1 produces a findings report with ranked bottlenecks + fix candidates. No code is shipped until you approve the top recommendation.
+
+The shape `/team` enforces: **measurement before claim**. No agent says "X is slow" without profiler output that proves it.
+
+#### Recipe 3: Comprehensive review before shipping a feature branch
+
+```
+/team Pre-merge review of feature/oauth-redesign — security, performance,
+docs, tests, breaking changes
+```
+
+`/team` recognizes the multi-dimensional scope and dispatches `security-auditor` + `code-reviewer` (≥75% confidence findings only) + `performance-engineer` (regression check vs main) + `qa-strategist` (test coverage adequacy) + `documentation-agent` (API doc drift) in parallel. Output: ranked finding list with severity + remediation per item. You decide which to fix before merge vs follow-up.
+
+This catches things a single-pass `/audit` misses — different agents notice different failure shapes.
+
 ### Investigating a Bug
 
 ```
