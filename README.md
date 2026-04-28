@@ -1,6 +1,6 @@
 # Claude Second Brain
 
-25 slash commands + 17 specialized agents for [Claude Code](https://docs.anthropic.com/en/docs/claude-code) that enforce consistent, high-quality development workflows.
+27 slash commands + 17 specialized agents for [Claude Code](https://docs.anthropic.com/en/docs/claude-code) that enforce consistent, high-quality development workflows — plus a memory system that lets Claude actually remember across sessions and a *Mythos pattern* for partnerships where the artifacts become the substrate.
 
 **New here?** Jump to [QUICK-START.md](QUICK-START.md) for install + a hands-on walkthrough.
 
@@ -33,10 +33,13 @@ Updates auto-sync on `git pull` via post-merge hook. Personal agents go in `~/.c
 | **[TOOLKIT.md](TOOLKIT.md)** | Why the toolkit matters — 9 Before & After scenarios |
 | **[PLAYBOOK.md](PLAYBOOK.md)** | Daily workflow recipes, prompt patterns, agent composition, AI/LLM security |
 | **[docs/TOP-COMMANDS.md](docs/TOP-COMMANDS.md)** | Top 10 commands cheat sheet with examples + decision tree |
-| **[docs/COMMANDS.md](docs/COMMANDS.md)** | Full reference for all 25 commands |
+| **[docs/COMMANDS.md](docs/COMMANDS.md)** | Full reference for all 27 commands |
 | **[docs/AGENTS.md](docs/AGENTS.md)** | Full reference for all 17 agents |
 | **[docs/SELF-LEARNING.md](docs/SELF-LEARNING.md)** | CLAUDE.md workflow + 5-layer learning system |
 | **[docs/ADVANCED-PATTERNS.md](docs/ADVANCED-PATTERNS.md)** | Skills crystallization, context recovery, post-audit remediation |
+| **[docs/PURPOSE.md](docs/PURPOSE.md)** | Public/private boundary — what each subtree IS and IS NOT for |
+| **[docs/mythos/PATTERN.md](docs/mythos/PATTERN.md)** | The Mythos pattern — when artifacts become substrate (advanced/optional) |
+| **[docs/TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md)** | Common issues + Security & Portability env-var reference |
 | **[SETUP-MEMORY.md](SETUP-MEMORY.md)** | Memory system installation — LM Studio, MCP server, hybrid search |
 | **[CLAUDE.md.template](CLAUDE.md.template)** | Global rules template — TDD, security, self-learning protocol |
 | **[docs/ROLLOUT-GUIDE.md](docs/ROLLOUT-GUIDE.md)** | Operational guide — when to scan, how to interpret, team cadence |
@@ -46,7 +49,7 @@ Start with **QUICK-START.md** to get set up. Read **TOOLKIT.md** to see why it m
 
 ## What's Included
 
-### Commands (25)
+### Commands (27)
 
 | Command | Description |
 |---------|-------------|
@@ -75,6 +78,8 @@ Start with **QUICK-START.md** to get set up. Read **TOOLKIT.md** to see why it m
 | `/harden-memory` | Audit and harden the memory auto-sync pipeline end-to-end |
 | `/economy` | Optimize token consumption while maintaining result quality |
 | `/context-save` | Checkpoint task state to survive context compaction |
+| `/mythos-codify` | Codify the Mythos approach as a non-negotiable CLAUDE.md rule + ship a public/private boundary doc |
+| `/design-mythos-substrate` | Honest, first-person design pass on extending memory primitives with purpose / cognition / affective layers (research-grade) |
 
 ### Agents (17)
 
