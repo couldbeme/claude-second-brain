@@ -18,6 +18,8 @@ Hook payload shape (Claude Code v2.x):
 
 Output file:
     ~/.claude/projects/<slug>/memory/context_pre_compact_<session_id>.md
+    (where <slug> is the absolute cwd with '/' replaced by '-' — Claude Code's
+    project-slug convention)
 
 Atomic write: write to .tmp sibling, then os.replace() for crash-safety.
 """

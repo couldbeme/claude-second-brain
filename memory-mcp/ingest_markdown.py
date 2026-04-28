@@ -1,9 +1,9 @@
 """Sync markdown auto-memory → sqlite-vec memory.db.
 
 Closes the gap where today's markdown writes aren't queryable via /recall.
-Walks ~/.claude/projects/<slug>/memory/*.md, parses YAML
-frontmatter, maps type → category, content-hash dedups against existing
-DB rows, inserts/updates.
+Walks ~/.claude/projects/<slug>/memory/*.md (slug derived from current
+working directory), parses YAML frontmatter, maps type → category,
+content-hash dedups against existing DB rows, inserts/updates.
 
 Designed to run as:
   - SessionStart hook (silent, fast — only writes new content)
@@ -28,8 +28,17 @@ MEMORY_MCP_DIR = Path.home() / ".claude" / "memory-mcp"
 sys.path.insert(0, str(MEMORY_MCP_DIR))
 from db import MemoryDB  # noqa: E402
 
+def _project_slug(path: Path | None = None) -> str:
+    """Claude Code derives its per-project memory dir by replacing '/' with '-'
+    in the absolute path. Reproduce that mapping for the current cwd so this
+    script points at the right `~/.claude/projects/<slug>/memory/` dir on any
+    user's machine."""
+    p = (path or Path.cwd()).resolve()
+    return str(p).replace("/", "-")
+
+
 DEFAULT_MEMORY_DIR = (
-    Path.home() / ".claude" / "projects" / "<slug>" / "memory"
+    Path.home() / ".claude" / "projects" / _project_slug() / "memory"
 )
 DEFAULT_DB_PATH = Path.home() / ".claude" / "memory" / "memory.db"
 DEFAULT_REPORT_PATH = Path.home() / ".claude" / "plans" / "ingest-dryrun-report.md"
