@@ -90,17 +90,22 @@ Categories drawn from common offensive-security taxonomies for AI agents (prompt
 
 ---
 
-## How this differs from adjacent toolkits
+## Where this fits in the ecosystem
 
-**[everything-claude-code](https://github.com/affaan-m/everything-claude-code)** (affaan-m) — Claude Code native, lightweight, large community. Autonomy-first; AgentShield is a sub-feature you opt into. We lead with safety as the organizing narrative, not a module.
+Adjacent toolkits exist with different shapes:
 
-**[Chachamaru127/claude-code-harness](https://github.com/Chachamaru127/claude-code-harness)** — Go binary, R01-R13 declarative rules, Plan→Work→Review autonomy loop. Pitched as agentic autonomy. We add no binary — every enforcement property uses Claude Code's own primitives.
+- **[everything-claude-code](https://github.com/affaan-m/everything-claude-code)** (affaan-m, 169k stars) — comprehensive multi-platform agent harness (Claude Code, Codex, Opencode, Cursor). Ships an integrated agent-security scanner via the `/security-scan` skill — red-team / blue-team / auditor pipeline, 102 static rules, 1,282 tests, also available as standalone CLI / GitHub Action / GitHub App. Their posture: detect vulnerabilities in existing agent configs.
 
-**[OpenClaw](https://github.com/openclaw/openclaw)** — widely deployed, large ecosystem. Also the source of the documented failures cited above (CVE surface, supply-chain exposure, government bans). We are not a fork of it.
+- **[claude-code-harness](https://github.com/Chachamaru127/claude-code-harness)** (Chachamaru127) — Go-native binary, R01-R13 declarative rules, Plan → Work → Review autonomy loop.
 
-**Lovable / Bolt / Rork** — hosted, UI-first, no-code target audience. Different category. If you are using Claude Code directly, those tools don't apply.
+- **OpenClaw, Lovable, Bolt, Rork** — different categories (mass-deployed autonomous frameworks; hosted no-code UIs). Not direct comparisons for Claude Code config users.
 
-The specific delta we can defend: safety-first narrative + zero-infrastructure enforcement + codified truthfulness/privacy floor as named, versioned properties. Others may have some of these; none document all three as first-class, verifiable constraints.
+This toolkit does less. Smaller surface (27 commands, 17 agents). What we ship:
+
+- **Opinionated primitive defaults** that prevent classes of failure by design — append-only audit journal, plan-mode-first, privacy floor on continuity, truthfulness rule, validation gates between agents.
+- **Code-level security scanning** at a different layer than agent-config scanners: `/scan` (full repo health: security + quality + gaps + ops), `/audit` (6-dimension codebase audit incl. security), `security-auditor` agent.
+
+The agent-config layer (MCP servers, hooks, permission misconfigs, prompt-injection vectors) is well-served by scanners like the `/security-scan` skill in everything-claude-code. The code layer (vulnerabilities in your application code, missing tests, dependency CVEs) is what our scanners target. Complementary, not competing.
 
 ---
 
