@@ -2,8 +2,8 @@
 
 Invoked by Claude Code's PreCompact hook immediately before session compaction.
 Reads the hook event JSON from stdin (which contains session_id, transcript_path,
-cwd), runs the context estimator, and writes a snapshot markdown file to the
-memory directory.
+cwd), runs the context estimator, and writes two snapshot files to the memory
+directory.
 
 Exit 0 always — never block compaction under any circumstance.
 
@@ -16,12 +16,16 @@ Hook payload shape (Claude Code v2.x):
         "hook_event_name": "PreCompact"
     }
 
-Output file:
+Output files (both written atomically via .tmp sibling + os.replace()):
     ~/.claude/projects/<slug>/memory/context_pre_compact_<session_id>.md
-    (where <slug> is the absolute cwd with '/' replaced by '-' — Claude Code's
-    project-slug convention)
-
-Atomic write: write to .tmp sibling, then os.replace() for crash-safety.
+        Token-metric snapshot: usage %, model, plan-file cross-refs.
+        (where <slug> is the absolute cwd with '/' replaced by '-' — Claude Code's
+        project-slug convention)
+    ~/.claude/projects/<slug>/memory/continuity_pre_compact_<session_id>.md
+        Content-rich continuity snapshot: decisions, open threads, in-flight state,
+        voice signals, persona deltas. Written by continuity_dump.write_continuity_snapshot()
+        after the token-metric snapshot. Swallows all exceptions — exit-0 guarantee
+        is preserved regardless of continuity-dump outcome.
 """
 
 from __future__ import annotations
@@ -120,7 +124,8 @@ def _build_snapshot(
             key=lambda p: p.stat().st_mtime,
             reverse=True,
         )
-        recent_plans = [str(p) for p in plan_files[:3]]
+        # Basename only — avoids leaking absolute path / OS username via the snapshot.
+        recent_plans = [p.name for p in plan_files[:3]]
 
     plans_section = (
         "\n".join(f"- {p}" for p in recent_plans)
@@ -211,7 +216,25 @@ def run(stdin_text: str) -> int:
     except Exception:  # noqa: BLE001 — never crash the hook
         pass  # Best-effort write; compaction must not be blocked
 
+    _write_continuity(session_id, cwd, memory_dir)
+
     return 0  # Always exit 0
+
+
+def _write_continuity(
+    session_id: str,
+    cwd: str,
+    memory_dir: Path,
+) -> None:
+    """Attempt continuity dump. Swallows all exceptions — never blocks compaction.
+
+    Stop-hook safety (claude-mem #987): writes to disk only. Never prints to stdout.
+    """
+    try:
+        from continuity_dump import write_continuity_snapshot  # noqa: PLC0415
+        write_continuity_snapshot(session_id, cwd, memory_dir)
+    except BaseException:  # noqa: BLE001 — Stop-hook safety: never escape, always exit 0
+        pass
 
 
 if __name__ == "__main__":

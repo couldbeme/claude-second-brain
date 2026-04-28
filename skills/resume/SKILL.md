@@ -12,7 +12,7 @@ argument-hint: (none — auto-detects state)
 Read these files in order, then synthesize a 1-page summary:
 
 1. **`~/.claude/checkpoint.md`** — manually-written dense state from the prior session (full read; primary anchor)
-2. **Most recent `~/.claude/projects/<slug>/memory/context_pre_compact_*.md`** if any (sort by mtime; read the latest) — auto-snapshot from PreCompact hook with token usage + plan-file pointers
+2. **Most recent `~/.claude/projects/<slug>/memory/context_pre_compact_*.md`** if any (sort by mtime; read the latest) — auto-snapshot from PreCompact hook with token usage + plan-file pointers; also read **`continuity_pre_compact_*.md`** from the same dir (sort by mtime; read the latest) — content-rich snapshot with decisions, open threads, in-flight state, and voice signals written by `continuity_dump.py`
 3. **`git -C ~/.claude log --oneline -8`** — recent second-brain commits (rules + memories)
 4. **`git -C ~/Dev/claude-second-brain log --oneline -10`** — recent toolkit commits (code + docs)
 5. **`git -C ~/.claude branch --show-current` + `git -C ~/Dev/claude-second-brain branch --show-current`** — confirm branches match expectations

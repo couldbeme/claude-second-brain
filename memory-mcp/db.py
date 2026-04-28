@@ -158,6 +158,42 @@ class MemoryDB:
                 FOREIGN KEY (to_id) REFERENCES memories(id)
             )
         """)
+
+        # Session threads table (Phase 5 L1 — continuity preservation).
+        # Additive-migration pattern: CREATE IF NOT EXISTS + PRAGMA column check.
+        # status constraint ('open' | 'closed' | 'deferred') is enforced in code,
+        # not in the DB schema, to preserve additive-only migration discipline.
+        # closed_at and project are deliberately omitted — closed_at is derivable
+        # from the flat-file THREAD-CLOSE entry (single source of truth, no drift),
+        # project is redundant with the per-project memory dir scope.
+        self.conn.execute("""
+            CREATE TABLE IF NOT EXISTS session_threads (
+                id TEXT PRIMARY KEY,
+                session_id TEXT NOT NULL,
+                description TEXT NOT NULL,
+                status TEXT NOT NULL DEFAULT 'open',
+                opened_at TEXT NOT NULL DEFAULT (datetime('now'))
+            )
+        """)
+
+        # Indexes for session_threads (idempotent)
+        self.conn.execute(
+            "CREATE INDEX IF NOT EXISTS idx_threads_session ON session_threads(session_id)"
+        )
+        self.conn.execute(
+            "CREATE INDEX IF NOT EXISTS idx_threads_status ON session_threads(status)"
+        )
+
+        # Additive column migration for session_threads (forward-compat hook)
+        _threads_cols = [
+            row[1]
+            for row in self.conn.execute("PRAGMA table_info(session_threads)").fetchall()
+        ]
+        # No new columns to add in v0.1 — guard is here for future migrations.
+        # Example pattern (do not remove):
+        #   if "new_col" not in _threads_cols:
+        #       self.conn.execute("ALTER TABLE session_threads ADD COLUMN new_col TEXT")
+
         self.conn.commit()
 
     def save(

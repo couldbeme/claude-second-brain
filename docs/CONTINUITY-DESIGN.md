@@ -2,7 +2,7 @@
 
 **Version:** v0.1 draft
 **Scope:** Pre-compact dump + `/resume` skill + session-bridge journal
-**Status:** Design — ready for L1 implementation
+**Status:** L1: shipped (commit pending) | Design phase closed
 
 ---
 
