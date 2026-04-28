@@ -10,6 +10,14 @@
 6. **Context-first.** Before starting any task, check existing project knowledge: CLAUDE.md, memory (`/recall`), recent audit reports, gap analyses, and documentation. Never redo work that's already been done. If a previous audit, refactoring, or analysis exists, build on it -- don't repeat it. This is especially important when onboarding to a project another teammate has already been working on.
 7. **No mocks as deliverables.** Never use mocks, stubs, or fake implementations and present them as working solutions. If something must be mocked (e.g., external service unavailable, hardware dependency), state it explicitly and get user approval before proceeding. Every mock left in place must be flagged in the summary with a clear `[MOCKED]` tag explaining what it replaces and what's needed to make it real. The default is always: build the real thing.
 
+8. **Session-bridge logging (continuity layer).** During a session, write structural entries to `session_bridge.md` via the bridge CLI as triggering events fire. Without these writes, the PreCompact hook has nothing to dump and `/resume` can't re-orient post-compaction. **Trigger when:** a non-trivial decision lands (`DECISION`), an agent dispatch / phase transition fires (`INFLIGHT`), an unresolved branch is flagged (`THREAD-OPEN`) or resolved (`THREAD-CLOSE`). **Invocation** (fire-and-forget; exit code not checked):
+
+```bash
+PATH/TO/memory-mcp/.venv/bin/python3 PATH/TO/memory-mcp/bridge_append.py <TYPE> "<payload>"
+```
+
+Payloads must be **structural metadata only** — never message-body verbatim. CLI caps at 500 chars and strips newlines as defense-in-depth. Full taxonomy + payload formats: `docs/CONTINUITY-DESIGN.md` §3 + `docs/CONTINUITY-SCHEMA.md`. Setup: `SETUP-MEMORY.md` Step 6.
+
 ## Communication Style
 
 - Lead with the answer, then explain.

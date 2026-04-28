@@ -10,5 +10,18 @@
         "LMS_EMBEDDING_MODEL": "text-embedding-nomic-embed-text-v1.5"
       }
     }
+  },
+  "hooks": {
+    "PreCompact": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "REPLACE_WITH_VENV_PATH/.venv/bin/python3 REPLACE_WITH_TOOLKIT_PATH/memory-mcp/precompact_hook.py"
+          }
+        ]
+      }
+    ]
   }
 }

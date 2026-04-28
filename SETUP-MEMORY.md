@@ -110,6 +110,53 @@ Save a test memory about this project using the memory tools
 Search my memories for "test"
 ```
 
+### Step 6: Enable the continuity layer (optional but recommended)
+
+The continuity layer captures structural session state (decisions, in-flight tasks, open threads) so a post-`/compact` session can re-orient via `/resume` instead of losing context. Two pieces:
+
+**6a. PreCompact hook** — already wired into the `settings.json.template` from Step 4. If you copied that template, the hook is registered. To verify:
+
+```bash
+grep -A 6 PreCompact ~/.claude/settings.json
+```
+
+You should see a hooks block pointing to `precompact_hook.py`.
+
+**6b. Bridge journal trigger rule** — add the following to your `~/.claude/CLAUDE.md` Non-Negotiable Rules so Claude knows when to log structural entries to `session_bridge.md` during a session. Without this, the journal stays empty and the continuity snapshot has nothing to capture.
+
+```markdown
+**Session-bridge logging.** During a session, write structural entries to
+`session_bridge.md` via the bridge CLI as triggering events fire. Invocation:
+
+```bash
+REPLACE_WITH_TOOLKIT_PATH/memory-mcp/.venv/bin/python3 \
+  REPLACE_WITH_TOOLKIT_PATH/memory-mcp/bridge_append.py <TYPE> "<payload>"
+```
+
+Trigger taxonomy (manual triggers — payload is structural metadata only,
+NEVER message-body verbatim):
+
+| Type | Fire when | Payload format |
+|---|---|---|
+| `DECISION` | A non-trivial decision lands | `<text> \| WHY: <rationale> \| REJECTED: <alt>` |
+| `INFLIGHT` | On agent dispatch / major sub-step transition | `task=<text> \| step=<text> \| next=<text>` |
+| `THREAD-OPEN` | Flag an unresolved branch | `<8-hex-id> \| <description>` |
+| `THREAD-CLOSE` | Branch resolves | `<8-hex-id>` |
+
+The CLI caps payloads at 500 chars and strips newlines. Calls are
+fire-and-forget — exit code is not checked.
+```
+
+**6c. Privacy gitignore** — add these lines to `~/.claude/.gitignore` to keep the bridge journal and continuity snapshots out of any private dotfiles backup:
+
+```
+projects/*/memory/continuity_pre_compact_*.md
+projects/*/memory/session_bridge.md
+projects/*/memory/session_bridge_*.md
+```
+
+After this setup, every `/compact` writes a `continuity_pre_compact_<session_id>.md` snapshot to your per-project memory dir, and `/resume` reads it on the next session start. See `docs/CONTINUITY-DESIGN.md` for the full architecture and `docs/CONTINUITY-SCHEMA.md` for the load-bearing field rationale.
+
 ## Available Memory Tools
 
 Once configured, Claude Code gets 7 new tools:

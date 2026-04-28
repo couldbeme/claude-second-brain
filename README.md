@@ -117,6 +117,7 @@ Persistent knowledge base that lets Claude Code remember across sessions. Uses l
 - **LM Studio is optional** -- without it, search falls back to keyword-only (the memory system itself is required)
 - **See [SETUP-MEMORY.md](SETUP-MEMORY.md)** for installation guide
 - **`memory-mcp/continuity_dump.py`** — writes a content-rich pre-compact snapshot (`continuity_pre_compact_<id>.md`) capturing decisions, open threads, in-flight state, and voice signals from the current session; invoked automatically by the PreCompact hook alongside the token-metric snapshot. Privacy: reads only `session_bridge.md` — never touches transcript bodies.
+- **`memory-mcp/bridge_append.py`** — CLI that Claude invokes during a session to append structural entries (`DECISION`, `INFLIGHT`, `THREAD-OPEN`, `THREAD-CLOSE`) to `session_bridge.md`. The PreCompact hook then dumps these entries into the continuity snapshot. Trigger taxonomy in `CLAUDE.md.template` rule 8; setup in [SETUP-MEMORY.md](SETUP-MEMORY.md) Step 6.
 - **`session_threads` DB table** — optional SQLite table in `memory.db` for durable cross-session thread tracking (open/closed/deferred); schema defined in `memory-mcp/db.py`.
 
 ## Your First 5 Minutes
