@@ -51,3 +51,7 @@ If a new file fits one of these, it ships:
 ## Keeping it true
 
 The public/private split is enforced by `.gitignore` patterns at the toolkit root. New private categories should add their `.gitignore` patterns at the time the file is first created — not retrofit after a leak audit.
+
+## Recent enforcement
+
+- **2026-04-28** — soft scrub of three internal continuity-system docs (`CONTINUITY-DESIGN.md`, `CONTINUITY-RESEARCH.md`, `CONTINUITY-SCHEMA.md`) that landed in `docs/` despite carrying audit-report markers, draft status, and internal phase milestones. `.gitignore` extended pre-emptively for `docs/SELF-AUDIT-DESIGN.md` to avoid the same pattern in Phase 6. A history-rewrite pass is scheduled separately.

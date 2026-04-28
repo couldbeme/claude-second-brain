@@ -155,7 +155,7 @@ projects/*/memory/session_bridge.md
 projects/*/memory/session_bridge_*.md
 ```
 
-After this setup, every `/compact` writes a `continuity_pre_compact_<session_id>.md` snapshot to your per-project memory dir, and `/resume` reads it on the next session start. See `docs/CONTINUITY-DESIGN.md` for the full architecture and `docs/CONTINUITY-SCHEMA.md` for the load-bearing field rationale.
+After this setup, every `/compact` writes a `continuity_pre_compact_<session_id>.md` snapshot to your per-project memory dir, and `/resume` reads it on the next session start.
 
 ## Available Memory Tools
 
