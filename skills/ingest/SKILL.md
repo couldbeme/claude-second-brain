@@ -79,7 +79,7 @@ Silent on success; idempotent on repeat session starts.
 ## Roadmap
 
 - v0.1 (this) — insert-only on hash dedup; updates flagged but not auto-applied (manual review)
-- v0.2 — auto-update with the newer-wins policy (per import_recovered_memories.py pattern)
+- v0.2 — auto-update with the newer-wins policy on hash mismatch
 - v0.3 — incremental mode (only scan files modified since last run via timestamp)
 
 ## Tests
