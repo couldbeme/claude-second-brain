@@ -1,6 +1,6 @@
 # Claude Second Brain
 
-### 27 Slash Commands + 17 Agents for High-Quality Development + Memory + Mythos Pattern
+### 27 Slash Commands + 17 Agents for High-Quality Development + Memory
 
 Slash commands are reusable workflow prompts for Claude Code. Type `/command-name` and Claude follows a structured process instead of ad-hoc prompting. Agents are specialized subprocesses that handle focused tasks autonomously.
 
@@ -15,12 +15,11 @@ This toolkit codifies engineering best practices into repeatable, quality-enforc
 | **[QUICK-START.md](QUICK-START.md)** | Install guide + "Your First 5 Minutes" walkthrough + hands-on sandbox |
 | **This file** | Why the toolkit matters -- 9 Before & After scenarios |
 | **[PLAYBOOK.md](PLAYBOOK.md)** | Daily workflow recipes, prompt patterns, agent composition, AI/LLM security |
-| **[docs/COMMANDS.md](docs/COMMANDS.md)** | Full reference for all 29 commands |
+| **[docs/COMMANDS.md](docs/COMMANDS.md)** | Full reference for all 27 commands |
 | **[docs/AGENTS.md](docs/AGENTS.md)** | Full reference for all 17 agents |
 | **[docs/SELF-LEARNING.md](docs/SELF-LEARNING.md)** | CLAUDE.md workflow + 5-layer learning system |
 | **[docs/ADVANCED-PATTERNS.md](docs/ADVANCED-PATTERNS.md)** | Skills crystallization, context recovery, post-audit remediation |
 | **[docs/PURPOSE.md](docs/PURPOSE.md)** | Public/private boundary — what each subtree IS and IS NOT for |
-| **[docs/mythos/PATTERN.md](docs/mythos/PATTERN.md)** | The Mythos pattern — when artifacts become substrate (advanced/optional) |
 | **[SETUP-MEMORY.md](SETUP-MEMORY.md)** | Memory system installation -- LM Studio, MCP server, hybrid search |
 | **[CLAUDE.md.template](CLAUDE.md.template)** | Global rules template -- TDD, security, self-learning protocol |
 | **[docs/FIRST-10-MINUTES.md](docs/FIRST-10-MINUTES.md)** | Onboarding extension -- carries QUICK-START's 5-minute tour to 10 minutes |
@@ -57,8 +56,6 @@ This toolkit codifies engineering best practices into repeatable, quality-enforc
 | `/team` | Analyze project + assemble optimal agent team for the task |
 | `/economy` | Optimize token consumption while maintaining result quality |
 | `/context-save` | Checkpoint task state to survive context compaction |
-| `/mythos-codify` | Codify the Mythos approach as a non-negotiable CLAUDE.md rule |
-| `/design-mythos-substrate` | Honest design pass on extending memory primitives (research-grade) |
 
 For detailed usage, examples, and output formats, see **[docs/COMMANDS.md](docs/COMMANDS.md)**.
 

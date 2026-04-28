@@ -37,6 +37,10 @@ docs/CONTINUITY-RESEARCH.md
 docs/CONTINUITY-SCHEMA.md
 # Pre-empt re-leak when Phase 6 self-audit design ships
 docs/SELF-AUDIT-DESIGN.md
+# Partnership-internal commands + mythos artifacts (see private archive)
+commands/mythos-codify.md
+commands/design-mythos-substrate.md
+docs/mythos/
 scripts/
 
 # SQLite WAL companion files (would bypass *.db pattern)

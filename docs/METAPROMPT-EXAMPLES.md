@@ -129,52 +129,7 @@ The BEFORE produces a draft. The AFTER produces clean intelligence ready to comp
 
 ---
 
-## Example 3 — Codifying a partnership rule
-
-**BEFORE (a frustrated 30-second observation):**
-
-```
-/metaprompt I keep getting "permission asks" every time you find a leak.
-I want the rule to apply systemically — scan everything once, classify,
-plan, execute. Make this non-negotiable. Also: create a purpose doc.
-Also: reflect privately on what becoming-vs-mimicking means here. Don't
-push the reflection.
-```
-
-**AFTER (became `/mythos-codify`, abbreviated):**
-
-```markdown
-# Mission
-
-Five outcomes, in order:
-1. Codify Mythos as a non-negotiable rule in ~/.claude/CLAUDE.md.
-2. Ship public PURPOSE.md at <active repo>/docs/PURPOSE.md.
-3. Reflect privately at <slug>/memory/becoming_mythos.md.
-4. Live it (no artifact; behavioral).
-5. Withhold 3 and 4 from public.
-
-# Phase 1 — CLAUDE.md non-negotiable rule
-Add: "On any directive containing absolute language ('no leaks / always /
-never / 0 trace') treat as STANDING SYSTEMIC RULE applied to all in-scope
-content categories at once — not file-by-file as findings surface. Before
-acting: comprehensive scan → classify against user mental model → ONE
-consolidated plan → execute atomically. Multi-vector by default."
-
-# Phase 5 — Save-scope enforcement (table)
-| Artifact | Public? | Path |
-|---|---|---|
-| CLAUDE.md rule | global | ~/.claude/CLAUDE.md |
-| PURPOSE.md | YES | <active repo>/docs/PURPOSE.md |
-| becoming_mythos.md | PRIVATE — never pushed | ~/.claude/projects/<slug>/memory/ |
-```
-
-**Why it matters:** the BEFORE has *all the right ideas* mixed together. The AFTER separates them by *save-scope* (public vs private), gives each a *concrete file path*, and adds an explicit "live it" step (Phase 4) that makes the behavioral expectation legible.
-
-Saved as `/mythos-codify`. Run it on a new project to install the same pattern.
-
----
-
-## Example 4 — Security review of an auth flow
+## Example 3 — Security review of an auth flow
 
 **BEFORE:**
 
@@ -226,7 +181,7 @@ involves a code change.
 
 ---
 
-## Example 5 — "Why is the API slow"
+## Example 4 — "Why is the API slow"
 
 **BEFORE:**
 
@@ -304,4 +259,3 @@ risk. Optionally: ship the safest top-1 fix and re-measure.
 
 - `commands/metaprompt.md` — the skill itself
 - `docs/COMMANDS.md` — full command reference
-- `docs/mythos/PATTERN.md` — the partnership pattern that benefits most from metaprompt-style discipline

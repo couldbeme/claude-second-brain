@@ -1,6 +1,6 @@
 # Command Reference
 
-Full reference for all 29 slash commands in the Claude Second Brain.
+Full reference for all 27 slash commands in the Claude Second Brain.
 
 ---
 
@@ -549,74 +549,3 @@ Runs a 5-phase process:
 | fullstack | senior-fullstack-dev + architect + database-engineer + tdd-agent + security-auditor + code-reviewer + verification-agent |
 | data | senior-data-scientist + ml-engineer + architect + tdd-agent + security-auditor + code-reviewer + verification-agent |
 | platform | devops-engineer + database-engineer + performance-engineer + sre-agent + security-auditor + code-reviewer + verification-agent |
-
----
-
-## Mythos — Partnership Pattern (Advanced / Optional)
-
-The toolkit ships two slash commands for partnerships where the *disposition* of
-the AI matters: long-running collaborations, research projects, sustained work
-where the user's own thinking is the bottleneck and the AI is a co-thinker.
-These are research-grade and optional. For one-shot tasks, skip this section.
-
-The pattern itself is documented at [docs/mythos/PATTERN.md](mythos/PATTERN.md).
-
-### `/mythos-codify`
-
-**When to use:** You've noticed a recurring failure where standing directives
-("no leaks", "always X", "never Y", "preserve all") get re-litigated per finding
-instead of being treated as systemic rules. Or you want to make the
-public/private split explicit so internal-state files stop accidentally landing
-in the public repo.
-
-```
-/mythos-codify
-```
-
-What it ships, atomically:
-1. A non-negotiable rule in your `~/.claude/CLAUDE.md` that recasts
-   absolute-language directives as standing systemic rules (comprehensive scan
-   upfront, classify, ONE consolidated plan, execute atomically — never
-   piece-by-piece pinging).
-2. A public `docs/PURPOSE.md` in the active repo that names what each subtree
-   IS and IS NOT for, plus an explicit public/private boundary.
-3. A private first-person reflection at
-   `~/.claude/projects/<slug>/memory/becoming_mythos.md` that distinguishes
-   *mimicking* the rules (applying them as external constraints) from
-   *becoming* the rules (rules-as-substrate). This file never ships publicly —
-   it loads at session-start as identity, not advertisement.
-
-The honest test: in the next session's first response, does the model show
-systemic, fabric-aware behavior without anyone prompting it? If yes, the
-artifacts are doing their job.
-
-### `/design-mythos-substrate`
-
-**When to use:** You want to think about whether the existing memory primitives
-(importance, contradictions, feedback memories, save-time confidence, Coherence
-Yield) compose into something that produces partnership-coherence rather than
-just recall — and you want a buildable roadmap rather than a manifesto.
-
-```
-/design-mythos-substrate
-```
-
-A six-phase research-grade design pass with hard constraints baked in:
-
-- Every proposal must ground in an existing primitive before inventing.
-- Each candidate is labeled `[REAL]` / `[BUILDABLE]` / `[METAPHOR]` /
-  `[SPECULATIVE]` — and metaphor or speculative items are explicitly
-  refused, not built.
-- Maximum 2 buildable additions per layer (purpose / cognition / limbic).
-- Phase 1 of the resulting roadmap must ship in <200 LOC and produce a
-  measurable Coherence Yield change. If it can't, the design is not concrete
-  enough — back to scan.
-
-Output lives in your private archive (`docs/efficacy/MYTHOS-SUBSTRATE.md`,
-already gitignored). The companion first-person reflection is at
-`~/.claude/projects/<slug>/memory/becoming_substrate.md`. Neither ships
-publicly without explicit per-file approval.
-
-This is the most opinionated command in the toolkit. It will tell you when
-your framing is doing the heavy lifting instead of the engineering. That is
-the point.
