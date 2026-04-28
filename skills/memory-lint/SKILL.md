@@ -16,7 +16,7 @@ Runs five deterministic, LLM-free checks over `~/.claude/projects/<slug>/memory/
 | **dead-paths** | `file:line` references in memory files where the path no longer exists |
 | **orphan-files** | Topic files in the memory dir that aren't linked from `MEMORY.md` |
 | **broken-index** | `MEMORY.md` links pointing at files that no longer exist |
-| **stale-patterns** | Configurable list of obsolete strings (`~/Dev/work/`, old repo names, etc.) |
+| **stale-patterns** | Configurable list of obsolete strings (`~/Projects/old-project/`, old repo names, etc.) |
 | **audit-log-schema** | `learning_audit.tsv` rows with wrong column count vs the 9-col schema |
 
 Out of scope (v0.1): semantic contradictions, persona drift, auto-fix. Those need an LLM call and arrive in v0.2+.
@@ -30,7 +30,7 @@ Out of scope (v0.1): semantic contradictions, persona drift, auto-fix. Those nee
   ~/Dev/claude-second-brain/memory-mcp/lint_memory.py
 ```
 
-Default scans `~/.claude/projects/<slug>/memory/` and audit-log at `learning_audit.tsv` in the same dir. Custom paths:
+Default scans the per-project memory dir under `~/.claude/projects/<slug>/memory/` (the slug is derived from your current working directory: absolute path with `/` replaced by `-`) and audit-log at `learning_audit.tsv` in the same dir. Custom paths:
 
 ```bash
 python3 lint_memory.py --memory-dir /path/to/memory --audit-log /path/to/audit.tsv
@@ -53,8 +53,8 @@ The report groups findings by kind:
   - learning_session_2026-04-27.md: missing /old/path/file.py:42
 
 ## stale-pattern (2)
-  - feedback_old.md: contains obsolete: '~/Dev/work/'
-  - project_legacy.md: contains obsolete: 'claude-code-team-toolkit'
+  - feedback_old.md: contains obsolete: '~/Projects/old-project/'
+  - project_legacy.md: contains obsolete: 'deprecated-toolkit'
 ```
 
 ### 3. Decide per finding
@@ -73,7 +73,7 @@ Lint should be idempotent. Re-running after fixes should report `✅ memory laye
 
 ## When to run
 
-- After a repo rename or major refactor (catches the `~/Dev/work/`-style stale paths)
+- After a repo rename or major refactor (catches the `~/Projects/old-project/`-style stale paths)
 - Before sharing or syncing memory to another machine (catches orphans)
 - Periodically (weekly?) — surfaces drift before it accumulates
 - Before any release/launch that ships memory artifacts publicly (catches accidental leaks)

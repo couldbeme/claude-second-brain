@@ -27,13 +27,21 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Iterable
 
-DEFAULT_MEMORY_DIR = Path.home() / ".claude" / "projects" / "<slug>" / "memory"
+def _project_slug(path: Path | None = None) -> str:
+    """Claude Code derives its per-project memory dir by replacing '/' with '-'
+    in the absolute path. Reproduce that mapping for the current cwd so the
+    linter points at the right `~/.claude/projects/<slug>/memory/` directory
+    on any user's machine."""
+    p = (path or Path.cwd()).resolve()
+    return str(p).replace("/", "-")
+
+
+DEFAULT_MEMORY_DIR = Path.home() / ".claude" / "projects" / _project_slug() / "memory"
 DEFAULT_AUDIT_LOG = DEFAULT_MEMORY_DIR / "learning_audit.tsv"
 DEFAULT_STALE_PATTERNS = [
-    "~/Dev/work/",
-    "claude-code-team-toolkit",
-    "Claude Code Team Toolkit",
-    "Team Toolkit",
+    "~/Projects/old-project/",
+    "deprecated-toolkit",
+    "Old Toolkit Name",
 ]
 # Project-specific patterns (private identities, prior org names, deprecated handles)
 # should be loaded from a user-controlled file at:

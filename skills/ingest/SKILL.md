@@ -51,7 +51,7 @@ In `~/.claude/settings.json`:
   "SessionStart": [{
     "hooks": [{
       "type": "command",
-      "command": "/Users/macbook/.claude/memory-mcp/.venv/bin/python3 /Users/macbook/Dev/claude-second-brain/memory-mcp/ingest_markdown.py --apply --quiet"
+      "command": "<HOME>/.claude/memory-mcp/.venv/bin/python3 <HOME>/Dev/claude-second-brain/memory-mcp/ingest_markdown.py --apply --quiet"
     }]
   }]
 }

@@ -107,18 +107,18 @@ class TestStalePatterns(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             tmp_p = Path(tmp)
             _write(tmp_p / "MEMORY.md", "")
-            _write(tmp_p / "topic.md", "Some old reference to ~/Dev/work/foo here.")
-            patterns = ["~/Dev/work/", "claude-code-team-toolkit"]
+            _write(tmp_p / "topic.md", "Some old reference to ~/Projects/old-project/foo here.")
+            patterns = ["~/Projects/old-project/", "deprecated-toolkit"]
             findings = check_stale_patterns(tmp_p, patterns)
             self.assertTrue(any(f.kind == "stale-pattern" for f in findings))
-            self.assertTrue(any("~/Dev/work/" in f.detail for f in findings))
+            self.assertTrue(any("~/Projects/old-project/" in f.detail for f in findings))
 
     def test_clean_content_not_flagged(self):
         with tempfile.TemporaryDirectory() as tmp:
             tmp_p = Path(tmp)
             _write(tmp_p / "MEMORY.md", "")
             _write(tmp_p / "topic.md", "Modern reference: ~/Dev/claude-second-brain/")
-            patterns = ["~/Dev/work/", "claude-code-team-toolkit"]
+            patterns = ["~/Projects/old-project/", "deprecated-toolkit"]
             findings = check_stale_patterns(tmp_p, patterns)
             stale = [f for f in findings if f.kind == "stale-pattern"]
             self.assertEqual(stale, [])
@@ -172,7 +172,7 @@ class TestCleanDirPasses(unittest.TestCase):
             findings = run_lint(
                 memory_dir=tmp_p,
                 audit_log_path=tmp_p / "no_audit.tsv",
-                stale_patterns=["~/Dev/work/", "claude-code-team-toolkit"],
+                stale_patterns=["~/Projects/old-project/", "deprecated-toolkit"],
             )
             self.assertEqual(findings, [], f"unexpected findings: {findings}")
 

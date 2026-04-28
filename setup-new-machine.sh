@@ -34,10 +34,14 @@
 set -euo pipefail
 
 # --- Config ---
-# GIT_HOST: override for multi-account SSH setups (e.g. github.com-personal)
+# Override these env vars to point at YOUR repos before running the script:
+#   SECOND_BRAIN_REPO  — your private memory/config repo (becomes ~/.claude). Optional;
+#                        leave blank if you don't keep a private mirror.
+#   TOOLKIT_REPO       — this public toolkit (default: anthropic-flavoured upstream).
+#   GIT_HOST           — override for multi-account SSH setups (e.g. github.com-personal).
 GIT_HOST="${GIT_HOST:-github.com}"
-SECOND_BRAIN_REPO="git@${GIT_HOST}:couldbeme/second-brain.git"
-TOOLKIT_REPO="git@${GIT_HOST}:couldbeme/claude-second-brain.git"
+SECOND_BRAIN_REPO="${SECOND_BRAIN_REPO:-}"
+TOOLKIT_REPO="${TOOLKIT_REPO:-https://github.com/<your-org>/claude-second-brain.git}"
 CLAUDE_DIR="$HOME/.claude"
 TOOLKIT_DIR="$HOME/Dev/claude-second-brain"
 AUTO=false
@@ -421,8 +425,10 @@ check "MCP venv exists"           "[[ -d $CLAUDE_DIR/memory-mcp/.venv ]]"
 check "MCP server.py exists"      "[[ -f $CLAUDE_DIR/memory-mcp/server.py ]]"
 check "MCP health check"          "$VENV_PYTHON $SERVER_PY --health-check"
 check "Memory directory exists"   "[[ -d $CLAUDE_DIR/memory ]]"
-check "Second brain git remote"   "git -C $CLAUDE_DIR remote -v | grep -q couldbeme"
-check "Toolkit git remote"        "git -C $TOOLKIT_DIR remote -v | grep -q couldbeme"
+if [[ -n "$SECOND_BRAIN_REPO" ]]; then
+  check "Second brain git remote"   "git -C $CLAUDE_DIR remote -v | grep -q origin"
+fi
+check "Toolkit git remote"        "git -C $TOOLKIT_DIR remote -v | grep -q origin"
 
 echo ""
 printf "${BOLD}Result: $PASS/$TOTAL checks passed${RESET}\n"

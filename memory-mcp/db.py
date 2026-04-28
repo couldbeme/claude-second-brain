@@ -160,6 +160,10 @@ class MemoryDB:
         confidence: float = 0.75,
     ) -> str:
         """Save a memory and return its ID. Pass mem_id to preserve an existing ID (e.g. during import)."""
+        if visibility not in self.VALID_VISIBILITIES:
+            raise ValueError(
+                f"visibility must be one of {self.VALID_VISIBILITIES}, got {visibility!r}"
+            )
         mem_id = mem_id or _generate_id()
         tags_json = json.dumps(tags or [])
         confidence = max(0.0, min(1.0, confidence))

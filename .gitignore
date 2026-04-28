@@ -11,12 +11,12 @@ memory/memories-export.json
 # Personal customizations (not shared with team)
 personal/
 
-# Lexicon — partnership-DSL kept private (sensitive co-curated vocabulary)
+# Personal vocabulary / internal glossary — kept private
 docs/LEXICON.md
 docs/LEXICON-*.md
 
 # Internal artifacts — drafts, proposals, plans, dev-backlog
-# Held in private archive at ~/.claude/projects/<slug>/memory/launch_archive/
+# Held in the author's private layer outside this repo
 docs/launch/
 docs/efficacy/
 docs/SELF-LEARNING*
@@ -32,3 +32,25 @@ docs/BENCHMARK-LANDSCAPE.md
 docs/BENCHMARK-PLAN.md
 BACKLOG.md
 scripts/
+
+# SQLite WAL companion files (would bypass *.db pattern)
+*.db-shm
+*.db-wal
+
+# Standard secret-file patterns (defense-in-depth)
+*.pem
+*.key
+secrets.json
+credentials.json
+service-account*.json
+id_rsa
+id_rsa.pub
+
+# OS / editor artifacts
+.DS_Store
+*.swp
+*.swo
+
+# Private partnership reflection (lives outside this repo; belt-and-suspenders ignore)
+becoming_mythos.md
+PURPOSE-private.md

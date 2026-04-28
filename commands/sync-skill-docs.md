@@ -21,7 +21,7 @@ Skill: $ARGUMENTS
 
 ```bash
 cd ~/Dev/claude-second-brain
-git checkout main && git pull <your-org> main
+git checkout main && git pull origin main
 git checkout -b docs/add-{skill-name}-skill
 ```
 
@@ -112,7 +112,7 @@ Skill sync complete (not pushed):
   Docs updated: README.md, docs/COMMANDS.md, TOOLKIT.md [, PLAYBOOK.md]
   Command count: X → Y
 
-  Ready to push? Specify remote: <your-org> (org) or origin (personal)
+  Ready to push? Specify remote: origin (org) or origin (personal)
 ```
 
 ## Rules

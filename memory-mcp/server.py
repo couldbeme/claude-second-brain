@@ -280,7 +280,10 @@ async def memory_context(
     if include_rules:
         rules = db.list_memories(category="rule", sort_by="importance", sort_order="desc", limit=20)
         if rules:
-            rules_text = "\n".join(f"- [{r['importance']}/10] {r['summary'] or r['content'][:100]}" for r in rules)
+            rules_text = "\n".join(
+                f"- [{r['importance']}/10] {_sanitize_memory_content(r['summary'] or r['content'][:100])}"
+                for r in rules
+            )
             context_parts.append(f"## Rules\n{rules_text}")
             token_budget -= len(rules_text) // 4  # Rough token estimate
 
@@ -315,7 +318,8 @@ async def memory_context(
         )
         if proj_context:
             proj_text = "\n".join(
-                f"- {r['summary'] or r['content'][:100]}" for r in proj_context
+                f"- {_sanitize_memory_content(r['summary'] or r['content'][:100])}"
+                for r in proj_context
             )
             context_parts.append(f"## Project Context\n{proj_text}")
 

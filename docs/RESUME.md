@@ -47,8 +47,9 @@ If `SessionStart` and `PreCompact` hooks are configured (see *Setup* below), `/i
 ## Scenario C — Different machine (full restart)
 
 ```bash
-# 1. Clone the private second-brain (becomes ~/.claude)
-git clone git@github.com:couldbeme/second-brain.git ~/.claude
+# 1. (Optional) Clone your own private memory/config repo as ~/.claude
+#    Skip this step if you don't keep one — `~/.claude` will be created fresh.
+git clone <your-private-claude-repo> ~/.claude
 
 # 2. Clone the public toolkit
 git clone git@github.com:couldbeme/claude-second-brain.git ~/Dev/claude-second-brain
@@ -76,19 +77,19 @@ Add to `~/.claude/settings.json` under the root object, alongside `permissions` 
   "SessionStart": [{
     "hooks": [{
       "type": "command",
-      "command": "/Users/macbook/.claude/memory-mcp/.venv/bin/python3 /Users/macbook/Dev/claude-second-brain/memory-mcp/ingest_markdown.py --apply --quiet"
+      "command": "<HOME>/.claude/memory-mcp/.venv/bin/python3 <HOME>/Dev/claude-second-brain/memory-mcp/ingest_markdown.py --apply --quiet"
     }]
   }],
   "PreCompact": [{
     "hooks": [{
       "type": "command",
-      "command": "/Users/macbook/.claude/memory-mcp/.venv/bin/python3 /Users/macbook/Dev/claude-second-brain/memory-mcp/precompact_hook.py"
+      "command": "<HOME>/.claude/memory-mcp/.venv/bin/python3 <HOME>/Dev/claude-second-brain/memory-mcp/precompact_hook.py"
     }]
   }]
 }
 ```
 
-**Adjust the absolute paths** if your install differs. Run `which python3` from the venv to confirm. After this is in place, both auto-fire on every session.
+**Replace `<HOME>` with your absolute home path** (e.g. `/home/<user>` on Linux, `/Users/<user>` on macOS). Run `echo $HOME` to find it. After this is in place, both auto-fire on every session.
 
 To verify the hooks fired:
 - `SessionStart`: `head -3 ~/.claude/plans/ingest-dryrun-report.md` (or apply-report) — recent timestamp = fired
@@ -103,7 +104,7 @@ When Claude Code starts a session in any project dir:
 2. `~/.claude/projects/<slug>/memory/MEMORY.md` — index of all auto-memory files
 
 Sample MEMORY.md auto-load includes (today's session):
-- User Profile (Asperger's, voice signals, persona)
+- User Profile (communication-style preferences, persona signals)
 - Procedural-mode slip feedback memory
 - Don't-undersell-us framing rule
 - NEVER re-read unchanged files (rule 9)

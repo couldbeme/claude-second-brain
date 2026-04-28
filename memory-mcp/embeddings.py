@@ -32,11 +32,19 @@ class EmbeddingClient:
         self._available: Optional[bool] = None
 
         if not any(url.startswith(prefix) for prefix in _SAFE_URL_PREFIXES):
+            # Non-localhost URLs require explicit opt-in via LMS_EMBEDDING_ALLOW_REMOTE=1.
+            # Otherwise refuse — sending memory content to a remote endpoint without
+            # explicit consent is silent exfiltration.
+            if os.environ.get("LMS_EMBEDDING_ALLOW_REMOTE") != "1":
+                raise ValueError(
+                    f"Refusing remote embedding URL {url!r}. "
+                    "Set LMS_EMBEDDING_URL to a localhost address, or "
+                    "LMS_EMBEDDING_ALLOW_REMOTE=1 to acknowledge the data-egress risk."
+                )
             logger.warning(
-                "Embedding URL %r is not a localhost address -- remote URL may "
-                "exfiltrate text to an untrusted server. Set LMS_EMBEDDING_URL "
-                "to a localhost address to silence this warning.",
-                url,
+                "Embedding URL %r is remote; LMS_EMBEDDING_ALLOW_REMOTE=1 set. "
+                "Memory content will be POSTed to %s.",
+                url, url,
             )
 
     async def is_available(self) -> bool:
