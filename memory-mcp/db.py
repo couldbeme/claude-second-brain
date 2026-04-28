@@ -106,6 +106,22 @@ class MemoryDB:
                 FOREIGN KEY (memory_b_id) REFERENCES memories(id)
             )
         """)
+
+        # Feedback violations table (MYTHOS-SUBSTRATE Phase 1) — behavioral
+        # surprise detection: when current session activity matches a feedback
+        # memory's trigger pattern, the system records the would-be slip.
+        self.conn.execute("""
+            CREATE TABLE IF NOT EXISTS feedback_violations (
+                id TEXT PRIMARY KEY,
+                feedback_memory_id TEXT NOT NULL,
+                matched_text TEXT NOT NULL,
+                matched_pattern TEXT NOT NULL,
+                session_id TEXT,
+                detected_at TEXT DEFAULT (datetime('now')),
+                resolution TEXT DEFAULT 'unresolved',
+                FOREIGN KEY (feedback_memory_id) REFERENCES memories(id)
+            )
+        """)
         self.conn.commit()
 
         # Create FTS5 table if not exists

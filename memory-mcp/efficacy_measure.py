@@ -178,3 +178,78 @@ def coherence_yield(
         "ci_95": (ci_lo, ci_hi),
         "window": (cutoff, now),
     }
+
+
+def coherence_yield_behavior(
+    db: "MemoryDB",
+    window_days: int = 30,
+    lambda_drift: float = 2.0,
+    now: Optional[datetime] = None,
+) -> dict:
+    """CY-behavior — behavioral self-coherence companion to coherence_yield().
+
+    Reads from `feedback_violations` table. Each violation is an instance of
+    self-contradiction with prior corrective state — the same shape CY measures
+    on the memory axis, applied to behavior.
+
+    Returns dict with:
+        cy_behavior: float in [0, 1], 1.0 = no violations, lower = more drift
+        n_violations: int — total violations in window
+        n_unresolved: int — violations with resolution='unresolved'
+        delta_drift: float in [0, 1] — unresolved fraction
+    """
+    if now is None:
+        now = datetime(2026, 1, 1, 0, 0, 0)
+    cutoff_iso = (now - timedelta(days=window_days)).isoformat()
+
+    rows = db.conn.execute(
+        """SELECT resolution FROM feedback_violations
+           WHERE detected_at >= ?""",
+        (cutoff_iso,),
+    ).fetchall()
+    n = len(rows)
+    if n == 0:
+        return {"cy_behavior": 1.0, "n_violations": 0, "n_unresolved": 0, "delta_drift": 0.0}
+
+    n_unresolved = sum(1 for (res,) in rows if res == "unresolved")
+    delta_drift = n_unresolved / n
+    # Penalty shape parallels memory CY: more violations and higher unresolved-rate
+    # both lower the score. Normalization caps the violation rate at 1.0.
+    violation_rate = min(n / max(window_days, 1), 1.0)
+    cy_behavior = (1.0 - violation_rate) / (1.0 + lambda_drift * delta_drift)
+    return {
+        "cy_behavior": max(0.0, min(1.0, cy_behavior)),
+        "n_violations": n,
+        "n_unresolved": n_unresolved,
+        "delta_drift": delta_drift,
+    }
+
+
+def coherence_yield_total(
+    db: "MemoryDB",
+    alpha: float = 0.7,
+    window_days: int = 30,
+    lambda_drift: float = 2.0,
+    now: Optional[datetime] = None,
+) -> dict:
+    """CY-total — weighted blend of memory + behavior CY.
+
+    cy_total = alpha · cy_memory + (1 - alpha) · cy_behavior
+
+    alpha defaults to 0.7 (memory weighted more). The right weighting is
+    partnership-specific and should be eval'd, not assumed.
+    """
+    if not (0.0 <= alpha <= 1.0):
+        raise ValueError(f"alpha must be in [0, 1], got {alpha}")
+
+    mem = coherence_yield(db, window_days=window_days, lambda_drift=lambda_drift, now=now)
+    beh = coherence_yield_behavior(db, window_days=window_days, lambda_drift=lambda_drift, now=now)
+    cy_total = alpha * mem["cy"] + (1.0 - alpha) * beh["cy_behavior"]
+    return {
+        "cy_total": cy_total,
+        "cy_memory": mem["cy"],
+        "cy_behavior": beh["cy_behavior"],
+        "alpha": alpha,
+        "n_pairs": mem["n_pairs"],
+        "n_violations": beh["n_violations"],
+    }
