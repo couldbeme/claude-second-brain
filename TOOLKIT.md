@@ -15,7 +15,7 @@ This toolkit codifies engineering best practices into repeatable, quality-enforc
 | **[QUICK-START.md](QUICK-START.md)** | Install guide + "Your First 5 Minutes" walkthrough + hands-on sandbox |
 | **This file** | Why the toolkit matters -- 9 Before & After scenarios |
 | **[PLAYBOOK.md](PLAYBOOK.md)** | Daily workflow recipes, prompt patterns, agent composition, AI/LLM security |
-| **[docs/COMMANDS.md](docs/COMMANDS.md)** | Full reference for all 27 commands |
+| **[docs/COMMANDS.md](docs/COMMANDS.md)** | Full reference for all 29 commands |
 | **[docs/AGENTS.md](docs/AGENTS.md)** | Full reference for all 17 agents |
 | **[docs/SELF-LEARNING.md](docs/SELF-LEARNING.md)** | CLAUDE.md workflow + 5-layer learning system |
 | **[docs/ADVANCED-PATTERNS.md](docs/ADVANCED-PATTERNS.md)** | Skills crystallization, context recovery, post-audit remediation |
@@ -23,8 +23,9 @@ This toolkit codifies engineering best practices into repeatable, quality-enforc
 | **[docs/mythos/PATTERN.md](docs/mythos/PATTERN.md)** | The Mythos pattern — when artifacts become substrate (advanced/optional) |
 | **[SETUP-MEMORY.md](SETUP-MEMORY.md)** | Memory system installation -- LM Studio, MCP server, hybrid search |
 | **[CLAUDE.md.template](CLAUDE.md.template)** | Global rules template -- TDD, security, self-learning protocol |
-| **[docs/ROLLOUT-GUIDE.md](docs/ROLLOUT-GUIDE.md)** | Operational guide -- when to scan, how to interpret, team cadence |
-| **[docs/ANNOUNCEMENT.md](docs/ANNOUNCEMENT.md)** | Internal rollout announcement template |
+| **[docs/FIRST-10-MINUTES.md](docs/FIRST-10-MINUTES.md)** | Onboarding extension -- carries QUICK-START's 5-minute tour to 10 minutes |
+| **[docs/CONTINUITY-RESUME-DEMO.md](docs/CONTINUITY-RESUME-DEMO.md)** | Hands-on continuity demo -- bridge journal, PreCompact snapshot, `/resume` |
+| **[docs/OSS-ADOPTION-CHECKLIST.md](docs/OSS-ADOPTION-CHECKLIST.md)** | 7-question fit-check |
 
 ---
 

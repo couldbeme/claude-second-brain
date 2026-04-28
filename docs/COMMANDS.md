@@ -1,6 +1,6 @@
 # Command Reference
 
-Full reference for all 27 slash commands in the Claude Second Brain.
+Full reference for all 29 slash commands in the Claude Second Brain.
 
 ---
 

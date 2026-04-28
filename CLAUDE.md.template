@@ -16,7 +16,7 @@
 PATH/TO/memory-mcp/.venv/bin/python3 PATH/TO/memory-mcp/bridge_append.py <TYPE> "<payload>"
 ```
 
-Payloads must be **structural metadata only** — never message-body verbatim. CLI caps at 500 chars and strips newlines as defense-in-depth. Full taxonomy + payload formats: `docs/CONTINUITY-DESIGN.md` §3 + `docs/CONTINUITY-SCHEMA.md`. Setup: `SETUP-MEMORY.md` Step 6.
+Payloads must be **structural metadata only** — never message-body verbatim. CLI caps at 500 chars and strips newlines as defense-in-depth. Full taxonomy + payload formats: `docs/CONTINUITY-RESUME-DEMO.md` (type table). Setup: `SETUP-MEMORY.md` Step 6.
 
 ## Communication Style
 
