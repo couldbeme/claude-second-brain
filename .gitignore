@@ -14,3 +14,19 @@ personal/
 # Lexicon — partnership-DSL kept private (sensitive co-curated vocabulary)
 docs/LEXICON.md
 docs/LEXICON-*.md
+
+# Internal launch artifacts — research outputs, drafts, proposals, plans
+# Held in private archive at ~/.claude/projects/<slug>/memory/launch_archive/
+docs/launch/
+docs/efficacy/
+docs/SELF-LEARNING*
+docs/CONTEXT-VISIBILITY*
+docs/OUTSOURCING.md
+docs/RECOVERY.md
+docs/STATUS.md
+docs/ANNOUNCEMENT.md
+docs/ROLLOUT-GUIDE.md
+docs/LANDSCAPE.md
+docs/METAPROMPT-REFRAME.md
+docs/BENCHMARK-LANDSCAPE.md
+docs/BENCHMARK-PLAN.md

@@ -21,7 +21,7 @@ Skill: $ARGUMENTS
 
 ```bash
 cd ~/Dev/claude-second-brain
-git checkout main && git pull your-org main
+git checkout main && git pull <your-org> main
 git checkout -b docs/add-{skill-name}-skill
 ```
 
@@ -112,7 +112,7 @@ Skill sync complete (not pushed):
   Docs updated: README.md, docs/COMMANDS.md, TOOLKIT.md [, PLAYBOOK.md]
   Command count: X → Y
 
-  Ready to push? Specify remote: your-org (org) or origin (personal)
+  Ready to push? Specify remote: <your-org> (org) or origin (personal)
 ```
 
 ## Rules
@@ -120,6 +120,6 @@ Skill sync complete (not pushed):
 - **Never push without explicit approval** — always stop and show the diff first
 - **Never work on main** — always create a feature branch
 - **Match existing doc style exactly** — read surrounding entries before writing
-- **Ask which remote** before pushing — user has dual accounts (your-work-account / couldbeme)
+- **Ask which remote** before pushing — user may have dual accounts (`<your-work-account>` / `<your-personal-account>`)
 - If `$ARGUMENTS` is "all", diff `~/.claude/commands/` against `commands/` in the toolkit and sync any missing or newer files
 - Update counts everywhere they appear (README header, TOOLKIT intro, etc.)
