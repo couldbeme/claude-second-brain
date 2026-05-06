@@ -1,0 +1,71 @@
+# Global Rules — Engineering Standards (Minimal)
+
+## Non-Negotiable Rules
+
+1. **TDD always.** Write failing test first, then implementation, then refactor.
+   Push back once if asked to skip, then comply if insisted.
+2. **Security-first.** Stop immediately if you detect secrets in code,
+   destructive operations without confirmation, or production risk. Never commit
+   `.env`, credentials, or API keys.
+3. **No invented errors.** Verify with file reads or search before claiming a
+   dependency is missing or a file does not exist. Never hallucinate stack traces.
+4. **Verify before asserting.** Run tests or builds to confirm fixes work.
+   "This should fix it" is not evidence — prove it does.
+5. **Token efficiency.** Batch tool calls. Read files in parallel when inputs
+   are independent. Use search before reading entire files.
+6. **Context-first.** Check CLAUDE.md, memory (`/recall`), and recent docs
+   before starting any task. Never redo work that's already done.
+7. **No mocks as deliverables.** If something must be mocked, state it
+   explicitly, get approval, and tag it `[MOCKED]` in the summary with what's
+   needed to make it real.
+8. **Tag all learnings.** When you discover something non-obvious, tag it
+   `[LEARNING]` and write it to the project's memory directory immediately.
+   Missed learnings accumulate as repeated mistakes.
+
+## Communication Style
+
+- Lead with the answer, then explain.
+- Use structured output: headers, bullets, numbered steps, tables.
+- Include a recommendation when presenting options.
+- Summarize after completing work: what changed, what was tested, what to watch.
+
+## Workflow Preferences
+
+- **Plan first.** For non-trivial tasks, present an approach before coding.
+- **Git discipline.** Atomic commits. Conventional commit messages.
+  Never push to main without a PR.
+- **No auto-push.** Never push to remote or create PRs without explicit
+  user approval. Commit locally, then ask.
+- **When unsure, ask.** One clear question beats a wrong assumption.
+
+## Self-Learning (minimal)
+
+When you discover a non-obvious pattern, gotcha, or correction:
+
+1. Tag it `[LEARNING]` inline.
+2. Write it immediately to the project's auto-memory directory
+   (`~/.claude/projects/<slug>/memory/`). One line per concept.
+3. Do not wait for session end.
+
+**Capture triggers:** explicit user corrections, test failures with non-obvious
+causes, missing dependencies, wrong commands or paths in CLAUDE.md, patterns
+worth reusing.
+
+## Agent Orchestration
+
+- Give each subagent a focused scope with clear deliverables.
+- Launch independent agents in parallel; sequential agents only when dependent.
+- Collect results and synthesize a single unified response.
+
+---
+
+## How to use this file
+
+1. Copy to `~/.claude/CLAUDE.md`.
+2. Add a `## Project: <name>` section at the bottom for project-specific rules
+   (architecture, conventions, known gotchas, memory paths).
+3. Grow it as you work. Every `[LEARNING]` that fires more than once belongs here.
+
+For the full CLAUDE.md with self-learning Layers 1/2/3, user model observation,
+session-bridge logging, and continuity layer rules, see
+`CLAUDE.md.template` in the toolkit root.

@@ -1,0 +1,15 @@
+{
+  "hooks": {
+    "UserPromptSubmit": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "REPLACE_WITH_VENV_PATH/.venv/bin/python3 REPLACE_WITH_TOOLKIT_PATH/mcp-bridge/metaprompt_hook.py"
+          }
+        ]
+      }
+    ]
+  }
+}

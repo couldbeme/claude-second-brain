@@ -1,0 +1,231 @@
+{
+  "catalog_version": "2026-04-28",
+  "ttl_days": 90,
+  "features": [
+    {
+      "id": "HOOK-1",
+      "category": "Hooks",
+      "name": "UserPromptSubmit hook",
+      "description": "Runs a shell command before each user prompt is submitted",
+      "docs_url": "https://docs.anthropic.com/en/docs/claude-code/hooks",
+      "detection_rule_id": "R-CMD-4",
+      "status": "verified"
+    },
+    {
+      "id": "HOOK-2",
+      "category": "Hooks",
+      "name": "PreCompact hook",
+      "description": "Runs before context compaction — used for continuity dumps",
+      "docs_url": "https://docs.anthropic.com/en/docs/claude-code/hooks",
+      "detection_rule_id": "R-TMPL-1",
+      "status": "verified"
+    },
+    {
+      "id": "HOOK-3",
+      "category": "Hooks",
+      "name": "PostToolUse hook",
+      "description": "Runs after every tool call completes",
+      "docs_url": "https://docs.anthropic.com/en/docs/claude-code/hooks",
+      "detection_rule_id": "R-TMPL-1",
+      "status": "unverified"
+    },
+    {
+      "id": "HOOK-4",
+      "category": "Hooks",
+      "name": "Stop hook",
+      "description": "Runs when Claude stops (end of turn or session end)",
+      "docs_url": "https://docs.anthropic.com/en/docs/claude-code/hooks",
+      "detection_rule_id": null,
+      "status": "unverified"
+    },
+    {
+      "id": "MCP-1",
+      "category": "MCP Servers",
+      "name": "MCP server declaration in settings.json",
+      "description": "mcpServers key in ~/.claude/settings.json wires up MCP tools",
+      "docs_url": "https://docs.anthropic.com/en/docs/claude-code/mcp",
+      "detection_rule_id": "R-AGENT-5",
+      "status": "verified"
+    },
+    {
+      "id": "MCP-2",
+      "category": "MCP Servers",
+      "name": "MCP tool invocation in agent tools list",
+      "description": "Agent tools: field may list MCP-provided tool names",
+      "docs_url": "https://docs.anthropic.com/en/docs/claude-code/mcp",
+      "detection_rule_id": "R-AGENT-5",
+      "status": "verified"
+    },
+    {
+      "id": "MCP-3",
+      "category": "MCP Servers",
+      "name": "context7 MCP server",
+      "description": "Provides live library documentation lookup via MCP",
+      "docs_url": null,
+      "detection_rule_id": null,
+      "status": "unverified"
+    },
+    {
+      "id": "MCP-4",
+      "category": "MCP Servers",
+      "name": "deepwiki MCP server",
+      "description": "AI-powered documentation for GitHub repositories via MCP",
+      "docs_url": null,
+      "detection_rule_id": null,
+      "status": "unverified"
+    },
+    {
+      "id": "PLAN-1",
+      "category": "Plan Mode",
+      "name": "Plan mode activation",
+      "description": "Claude plans before acting when triggered by /plan or --plan flag",
+      "docs_url": "https://docs.anthropic.com/en/docs/claude-code/plan-mode",
+      "detection_rule_id": "R-CMD-5",
+      "status": "verified"
+    },
+    {
+      "id": "AGENT-1",
+      "category": "Agent Tool",
+      "name": "Task/Agent sub-agent spawning",
+      "description": "Commands can spawn subagents via the Agent tool with bounded scope",
+      "docs_url": "https://docs.anthropic.com/en/docs/claude-code/sub-agents",
+      "detection_rule_id": "R-CMD-2",
+      "status": "verified"
+    },
+    {
+      "id": "MODEL-1",
+      "category": "Model Selection",
+      "name": "model: opus for reasoning-heavy agents",
+      "description": "Agent frontmatter model: field selects the underlying model",
+      "docs_url": "https://docs.anthropic.com/en/docs/claude-code/agents",
+      "detection_rule_id": "R-AGENT-1",
+      "status": "verified"
+    },
+    {
+      "id": "MODEL-2",
+      "category": "Model Selection",
+      "name": "model: haiku for lightweight agents",
+      "description": "Haiku is optimal for lint/verify/check agents (cost + speed)",
+      "docs_url": "https://docs.anthropic.com/en/docs/claude-code/agents",
+      "detection_rule_id": "R-AGENT-2",
+      "status": "verified"
+    },
+    {
+      "id": "SKILL-1",
+      "category": "Skills Format",
+      "name": "argument-hint frontmatter key",
+      "description": "Commands and skills declare argument-hint for /guide discoverability",
+      "docs_url": "https://docs.anthropic.com/en/docs/claude-code/slash-commands",
+      "detection_rule_id": "R-CMD-1",
+      "status": "verified"
+    },
+    {
+      "id": "SKILL-2",
+      "category": "Skills Format",
+      "name": "SKILL.md format",
+      "description": "Skills live at skills/<name>/SKILL.md with YAML frontmatter",
+      "docs_url": null,
+      "detection_rule_id": "R-SKILL-1",
+      "status": "unverified"
+    },
+    {
+      "id": "SETTINGS-1",
+      "category": "Settings",
+      "name": "settings.json hook configuration",
+      "description": "Hooks declared under hooks: key in ~/.claude/settings.json",
+      "docs_url": "https://docs.anthropic.com/en/docs/claude-code/hooks",
+      "detection_rule_id": "R-SKILL-3",
+      "status": "verified"
+    },
+    {
+      "id": "SETTINGS-2",
+      "category": "Settings",
+      "name": "settings.json MCP server wiring",
+      "description": "mcpServers declared in ~/.claude/settings.json",
+      "docs_url": "https://docs.anthropic.com/en/docs/claude-code/mcp",
+      "detection_rule_id": "R-TMPL-2",
+      "status": "verified"
+    },
+    {
+      "id": "TMPL-1",
+      "category": "Template",
+      "name": "CLAUDE.md.template PostToolUse example",
+      "description": "Template should show PostToolUse hook usage for new users",
+      "docs_url": "https://docs.anthropic.com/en/docs/claude-code/hooks",
+      "detection_rule_id": "R-TMPL-1",
+      "status": "unverified"
+    },
+    {
+      "id": "TOOLS-1",
+      "category": "Tools",
+      "name": "Bash tool in agent tools list",
+      "description": "Agent must declare Bash in tools: to run shell commands",
+      "docs_url": "https://docs.anthropic.com/en/docs/claude-code/agents",
+      "detection_rule_id": "R-AGENT-3",
+      "status": "verified"
+    },
+    {
+      "id": "TOOLS-2",
+      "category": "Tools",
+      "name": "WebSearch/WebFetch in agent tools list",
+      "description": "Agent must declare WebSearch or WebFetch to do web lookups",
+      "docs_url": "https://docs.anthropic.com/en/docs/claude-code/agents",
+      "detection_rule_id": "R-AGENT-4",
+      "status": "verified"
+    },
+    {
+      "id": "SESSION-1",
+      "category": "Session",
+      "name": "Context window usage monitoring",
+      "description": "context_estimator tracks percent_used; >0.75 on sonnet → consider opus",
+      "docs_url": null,
+      "detection_rule_id": "R-SESSION-1",
+      "status": "verified"
+    },
+    {
+      "id": "TOOLS-3",
+      "category": "Tools",
+      "name": "Glob tool for file search",
+      "description": "Glob is the preferred tool for finding files by pattern",
+      "docs_url": "https://docs.anthropic.com/en/docs/claude-code/tools",
+      "detection_rule_id": null,
+      "status": "unverified"
+    },
+    {
+      "id": "TOOLS-4",
+      "category": "Tools",
+      "name": "Grep tool for text search",
+      "description": "Grep searches file contents without reading entire files",
+      "docs_url": "https://docs.anthropic.com/en/docs/claude-code/tools",
+      "detection_rule_id": null,
+      "status": "unverified"
+    },
+    {
+      "id": "CMD-1",
+      "category": "Commands",
+      "name": "$ARGUMENTS placeholder in command body",
+      "description": "User-provided text is injected at $ARGUMENTS in the command body",
+      "docs_url": "https://docs.anthropic.com/en/docs/claude-code/slash-commands",
+      "detection_rule_id": "R-CMD-1",
+      "status": "verified"
+    },
+    {
+      "id": "CMD-2",
+      "category": "Commands",
+      "name": "Orchestration phase structure in commands",
+      "description": "Multi-phase commands with parallel sub-agent spawning",
+      "docs_url": "https://docs.anthropic.com/en/docs/claude-code/sub-agents",
+      "detection_rule_id": "R-CMD-2",
+      "status": "verified"
+    },
+    {
+      "id": "AGENT-2",
+      "category": "Agent Tool",
+      "name": "tools: field restricts agent capabilities",
+      "description": "Agent tools: list is the security + capability boundary for subagents",
+      "docs_url": "https://docs.anthropic.com/en/docs/claude-code/agents",
+      "detection_rule_id": "R-AGENT-3",
+      "status": "verified"
+    }
+  ]
+}
