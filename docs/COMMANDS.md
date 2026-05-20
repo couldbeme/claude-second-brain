@@ -136,6 +136,28 @@ Add a null check after get_user() call, return 404 if user not found.
 Want me to fix this now? (I'll write a failing test first)
 ```
 
+### `/diagnose-bound`
+
+**When to use:** Any non-trivial root-cause work where the wrong mental model has cost you time before. Pairs naturally with `/diagnose` (interactive) or `/investigate` (autonomous) — `/diagnose-bound` is the *precondition gate*, not a replacement.
+
+```
+/diagnose-bound CommandError: multiple leaf nodes in migration graph
+/diagnose-bound docker compose silently recreated my db without host port
+/diagnose-bound fmt 11.0.2 consteval rejected by Xcode 26 clang
+```
+
+Five-phase recipe that refuses to start root-cause analysis until:
+
+1. **Phase 0** — extract affected stack(s) from the symptom
+2. **Phase 1** — bind a named-expert persona from `~/Dev/claude-second-brain/personas/` (fires `/persona-research <domain>` if no match)
+3. **Phase 2** — refresh the persona's field-intelligence cache via `/persona-recap <slug>` if stale
+4. **Phase 3** — pull *current* stack docs via `mcp__context7__resolve-library-id` + `query-docs`; WebFetch fallback; "training-data-only" caveat if both fail
+5. **Phase 4** — only now begin evidence-gated hypothesis loop; every claim has a runnable proof anchor
+
+**Output MUST include** `Persona:` + `Stack docs source:` headers. The skill refuses to deliver a diagnosis lacking either.
+
+**Why it exists:** solo, unbound diagnosis with stale training-data is the documented recurring cost in this toolkit's history (XXX_auto migration leaf, fmt 11 consteval, docker-compose-file-drift were all 30-second bugs that took hours). The discipline overrides time pressure — every 30-second bug becomes a 60-second bug, and the 60 seconds catches the wrong-mental-model errors.
+
 ### `/verify`
 
 **When to use:** Before a release, after a big refactor, weekly health check.

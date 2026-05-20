@@ -157,6 +157,22 @@ This catches things a single-pass `/audit` misses — different agents notice di
 /learn [what caused it]                     # 4. Prevent recurrence
 ```
 
+### Investigating a Hard Bug (persona-bound, mandatory live-docs)
+
+For non-trivial diagnoses where wrong mental models have cost you time before. `/diagnose-bound` refuses to start until a persona is bound and current docs are pulled.
+
+```
+/diagnose-bound [error or symptom]          # 0. Refuses without persona + live docs
+   ↳ checks ~/Dev/claude-second-brain/personas/ for matching domain
+   ↳ fires /persona-research <domain> if no match (parallel, non-blocking)
+   ↳ refreshes persona's recap cache via /persona-recap <slug> if stale
+   ↳ pulls current docs via mcp__context7__resolve-library-id + query-docs
+   ↳ then runs evidence-gated hypothesis loop with bound persona's mental models
+/learn [root cause]                         # 1. After fix lands — capture
+```
+
+Use over `/diagnose` when the failure mode is in a stack you haven't touched recently (Django migrations, Docker compose internals, native build chains, postgres internals) — the persona + live-docs combo catches the wrong-mental-model errors that account for most failed fixes.
+
 ### Refactoring Safely
 
 ```

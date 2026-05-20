@@ -48,6 +48,7 @@ This toolkit codifies engineering best practices into repeatable, quality-enforc
 | `/sync-memories` | Export/import knowledge between machines |
 | `/guide` | Interactive toolkit assistant -- suggests commands and workflows |
 | `/diagnose` | Interpret error screenshots, logs, or stack traces and fix |
+| `/diagnose-bound` | Mandatory persona-bound root-cause -- cache → /persona-research if absent → context7 docs refresh → diagnose. Refuses if precondition skipped. |
 | `/scan` | Full repository health scan -- security, quality, gaps, operational health |
 | `/flag` | Flag findings for team review instead of fixing unilaterally |
 | `/resolve-pr` | Fetch PR review comments, fix code, reply politely, push |

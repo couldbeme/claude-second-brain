@@ -116,7 +116,7 @@ Adjacent toolkits exist with different shapes:
 
 - **OpenClaw, Lovable, Bolt, Rork** — different categories (mass-deployed autonomous frameworks; hosted no-code UIs). Not direct comparisons for Claude Code config users.
 
-This toolkit does less. Smaller surface (27 commands, 17 agents). What we ship:
+This toolkit does less. Smaller surface (28 commands, 17 agents). What we ship:
 
 - **Opinionated primitive defaults** that prevent classes of failure by design — append-only audit journal, plan-mode-first, privacy floor on continuity, truthfulness rule, validation gates between agents.
 - **Code-level security scanning** at a different layer than agent-config scanners: `/scan` (full repo health: security + quality + gaps + ops), `/audit` (6-dimension codebase audit incl. security), `security-auditor` agent.
@@ -129,7 +129,7 @@ The agent-config layer (MCP servers, hooks, permission misconfigs, prompt-inject
 
 This is a starter library. Agents are not a fixed catalog — `/orchestrate` and `/team` compose them dynamically per task using Claude Code's Agent tool. Your own agents go in `~/.claude/agents/` and are never touched by updates.
 
-### Commands (27)
+### Commands (28)
 
 | Command | What it does |
 |---------|-------------|
@@ -150,6 +150,7 @@ This is a starter library. Agents are not a fixed catalog — `/orchestrate` and
 | `/sync-memories` | Export/import knowledge between machines |
 | `/guide` | Interactive toolkit assistant — suggests commands for your task |
 | `/diagnose` | Interpret error screenshots, logs, or stack traces and fix |
+| `/diagnose-bound` | Mandatory persona-bound root-cause: cache → /persona-research if absent → context7 docs refresh → THEN diagnose. Refuses if precondition skipped. |
 | `/scan` | Full repository health scan — security, quality, gaps, operational health |
 | `/flag` | Flag findings for team review instead of fixing unilaterally |
 | `/resolve-pr` | Fetch PR review comments, fix code, reply politely, push |
@@ -201,7 +202,7 @@ Install sets up command symlinks, the memory-mcp venv, and the PreCompact git ho
 | **[TOOLKIT.md](TOOLKIT.md)** | 9 BEFORE/AFTER scenarios — the workflow difference in practice |
 | **[PLAYBOOK.md](PLAYBOOK.md)** | Daily recipes, prompt patterns, agent composition, AI/LLM security |
 | **[docs/TOP-COMMANDS.md](docs/TOP-COMMANDS.md)** | Top 10 commands cheat sheet with examples + decision tree |
-| **[docs/COMMANDS.md](docs/COMMANDS.md)** | Full reference for all 27 commands |
+| **[docs/COMMANDS.md](docs/COMMANDS.md)** | Full reference for all 28 commands |
 | **[docs/AGENTS.md](docs/AGENTS.md)** | Full reference for all 17 agents |
 | **[docs/ADVANCED-PATTERNS.md](docs/ADVANCED-PATTERNS.md)** | Skills crystallization, context recovery, post-audit remediation |
 | **[docs/PURPOSE.md](docs/PURPOSE.md)** | Public/private boundary — what each subtree is and is not for |
