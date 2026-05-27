@@ -30,3 +30,9 @@ plans/PROMPT-LANGUAGE-DESIGN.md
 plans/REVISED-STRATEGY-*.md
 plans/DISTRIBUTION-PUNCH-LIST-*.md
 plans/AUTORESEARCH-BRAINSTORM.md
+
+# Per-project audit outputs — operator strategy + cross-project findings, not toolkit deliverables
+audits/
+
+# install.sh sync backups of pre-existing local skill files (auto-generated)
+*.personal-backup

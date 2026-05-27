@@ -147,7 +147,7 @@ Adjacent toolkits exist with different shapes:
 
 - **OpenClaw, Lovable, Bolt, Rork** — different categories (mass-deployed autonomous frameworks; hosted no-code UIs). Not direct comparisons for Claude Code config users.
 
-This toolkit does less. Smaller surface (28 commands, 17 agents). What we ship:
+This toolkit does less. Smaller surface (30 commands, 11 skills, 4 personas, 17 agents). What we ship:
 
 - **Opinionated primitive defaults** that prevent classes of failure by design — append-only audit journal, plan-mode-first, privacy floor on continuity, truthfulness rule, validation gates between agents.
 - **Code-level security scanning** at a different layer than agent-config scanners: `/scan` (full repo health: security + quality + gaps + ops), `/audit` (6-dimension codebase audit incl. security), `security-auditor` agent.
@@ -160,7 +160,7 @@ The agent-config layer (MCP servers, hooks, permission misconfigs, prompt-inject
 
 This is a starter library. Agents are not a fixed catalog — `/orchestrate` and `/team` compose them dynamically per task using Claude Code's Agent tool. Your own agents go in `~/.claude/agents/` and are never touched by updates.
 
-### Commands (28)
+### Commands (30)
 
 | Command | What it does |
 |---------|-------------|
@@ -192,6 +192,8 @@ This is a starter library. Agents are not a fixed catalog — `/orchestrate` and
 | `/context-save` | Checkpoint task state to survive context compaction |
 | `/idea` | Capture a side-idea instantly without breaking current task flow |
 | `/ideas` | View, prioritize, and manage the captured ideas backlog |
+| `/metaprompt-toggle` | Toggle `/metaprompt` auto-enhancement (off / fast / deep / status) |
+| `/whats-new` | Surface new Claude Code platform features since last local check |
 
 ### Agents (17, starter library)
 
@@ -200,6 +202,18 @@ This is a starter library. Agents are not a fixed catalog — `/orchestrate` and
 **Domain expert (10):** `senior-frontend-dev`, `senior-backend-dev`, `senior-fullstack-dev`, `senior-data-scientist`, `ml-engineer`, `devops-engineer`, `database-engineer`, `performance-engineer`, `sre-agent`, `qa-strategist`
 
 Full reference: [docs/AGENTS.md](docs/AGENTS.md)
+
+### Skills (11)
+
+Anthropic Agent Skills (spec-compatible across Claude Code, Claude.ai, Codex CLI):
+
+`/tribunal` · `/karpathy-bar` · `/iterate` · `/reflect` · `/resume` · `/ingest` · `/remind` · `/whats-new` · `/context-status` · `/memory-lint` · `/self-audit`
+
+### Personas (4, lens templates)
+
+Runtime-assembled by `/tribunal` from `personas/`:
+
+`falsifiability__popper` · `dual-process__kahneman` · `eliza-refusal__weizenbaum` · `agentic-coding__cherny`
 
 ---
 
@@ -233,7 +247,7 @@ Install sets up command symlinks, the memory-mcp venv, and the PreCompact git ho
 | **[TOOLKIT.md](TOOLKIT.md)** | 9 BEFORE/AFTER scenarios — the workflow difference in practice |
 | **[PLAYBOOK.md](PLAYBOOK.md)** | Daily recipes, prompt patterns, agent composition, AI/LLM security |
 | **[docs/TOP-COMMANDS.md](docs/TOP-COMMANDS.md)** | Top 10 commands cheat sheet with examples + decision tree |
-| **[docs/COMMANDS.md](docs/COMMANDS.md)** | Full reference for all 28 commands |
+| **[docs/COMMANDS.md](docs/COMMANDS.md)** | Full reference for all 30 commands |
 | **[docs/AGENTS.md](docs/AGENTS.md)** | Full reference for all 17 agents |
 | **[docs/ADVANCED-PATTERNS.md](docs/ADVANCED-PATTERNS.md)** | Skills crystallization, context recovery, post-audit remediation |
 | **[docs/PURPOSE.md](docs/PURPOSE.md)** | Public/private boundary — what each subtree is and is not for |
