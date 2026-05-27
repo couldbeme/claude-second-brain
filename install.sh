@@ -106,6 +106,46 @@ sync_md_files() {
     skip "  $label: $count base files checked"
 }
 
+# --- Sync skills (each skill is a subdir with SKILL.md + maybe more) ---
+sync_skills() {
+    local src_dir="$1" dst_dir="$2" label="$3"
+    [[ -d "$src_dir" ]] || return 0
+    mkdir -p "$dst_dir"
+
+    local count=0
+    for src_skill_dir in "$src_dir"/*/; do
+        [[ -d "$src_skill_dir" ]] || continue
+        local skill_name
+        skill_name="$(basename "$src_skill_dir")"
+        local dst_skill_dir="$dst_dir/$skill_name"
+        mkdir -p "$dst_skill_dir"
+        for src_file in "$src_skill_dir"*.md; do
+            [[ -f "$src_file" ]] || continue
+            link_file "$src_file" "$dst_skill_dir/$(basename "$src_file")"
+        done
+        count=$((count + 1))
+    done
+    skip "  $label: $count skill dirs checked"
+}
+
+# --- Sync personas (flat .md files with lens_type frontmatter) ---
+sync_personas() {
+    local src_dir="$1" dst_dir="$2" label="$3"
+    [[ -d "$src_dir" ]] || return 0
+    mkdir -p "$dst_dir"
+
+    local count=0
+    for src_file in "$src_dir"/*.md; do
+        [[ -f "$src_file" ]] || continue
+        case "$(basename "$src_file")" in
+            README.md|INDEX.md) continue ;;
+        esac
+        link_file "$src_file" "$dst_dir/$(basename "$src_file")"
+        count=$((count + 1))
+    done
+    skip "  $label: $count persona files checked"
+}
+
 # --- Sync memory-mcp source files (not .venv, not __pycache__) ---
 sync_memory_mcp() {
     local src_dir="$TOOLKIT_DIR/memory-mcp"
@@ -315,6 +355,14 @@ done
 # 2. Commands
 printf "${CYAN}--- Commands ---${RESET}\n"
 sync_md_files "$TOOLKIT_DIR/commands" "$CLAUDE_DIR/commands" "Commands"
+
+# 2.5. Skills (subdirs with SKILL.md)
+printf "${CYAN}--- Skills ---${RESET}\n"
+sync_skills "$TOOLKIT_DIR/skills" "$CLAUDE_DIR/skills" "Skills"
+
+# 2.6. Personas (flat .md files)
+printf "${CYAN}--- Personas ---${RESET}\n"
+sync_personas "$TOOLKIT_DIR/personas" "$CLAUDE_DIR/personas" "Personas"
 
 # Count personal commands
 PERSONAL_COMMANDS=0
