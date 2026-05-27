@@ -20,3 +20,13 @@ id_rsa.pub
 .DS_Store
 *.swp
 *.swo
+
+# Private operator artifacts — strategy/marketing drafts not for public history
+plans/gumroad-pro-pack-draft.md
+plans/dist-research-track-*.md
+plans/dist-revised-track-*.md
+plans/PRIVATE-ARTIFACTS.md
+plans/PROMPT-LANGUAGE-DESIGN.md
+plans/REVISED-STRATEGY-*.md
+plans/DISTRIBUTION-PUNCH-LIST-*.md
+plans/AUTORESEARCH-BRAINSTORM.md

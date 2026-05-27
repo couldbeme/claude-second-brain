@@ -160,6 +160,5 @@ The `/iterate` shape is generalized from Karpathy's pattern; the bet that single
 
 - `skills/tribunal/SKILL.md` — sibling skill (multi-lens decision)
 - `skills/reflect/SKILL.md` — sibling skill (single-lens retrospective)
-- `~/.claude/skills/karpathy-bar/SKILL.md` — recommended eval for prose `/iterate` invocations
-- `~/.claude/projects/-Users-macbook-Dev-claude-second-brain/memory/autoresearch_handoff_raw.md` — design substrate (handoff doc with the autoresearch analysis)
-- `plans/AUTORESEARCH-BRAINSTORM.md` — wall-clock-as-forcing-function principle
+- `skills/karpathy-bar/SKILL.md` — recommended eval for prose `/iterate` invocations
+- Prior art: [karpathy/autoresearch](https://github.com/karpathy/autoresearch) — the modify-one-file-under-wall-clock-budget pattern this skill generalizes; the wall-clock terminator is the load-bearing constraint.

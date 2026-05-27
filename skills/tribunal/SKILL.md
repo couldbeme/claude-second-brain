@@ -11,12 +11,16 @@ The driving question: *what does each load-bearing lens see in this proposition 
 
 ## How it differs from `llm-council`
 
-`/tribunal` adopts the fan-out shape of [karpathy/llm-council](https://github.com/karpathy/llm-council) and inverts the synthesis. Where `llm-council` reduces variance across *provider training runs* and collapses to a Chairman's single answer, `/tribunal` exposes variance across *theoretical lenses* and preserves the dissent. Diversity vector: persona, not provider. Output: named disagreement, not consensus. Full survey at `plans/papers/persona-extensions/llm-council-prior-art.md`.
+`/tribunal` adopts the fan-out shape of [karpathy/llm-council](https://github.com/karpathy/llm-council) and inverts the synthesis. Where `llm-council` reduces variance across *provider training runs* and collapses to a Chairman's single answer, `/tribunal` exposes variance across *theoretical lenses* and preserves the dissent. Diversity vector: persona, not provider. Output: named disagreement, not consensus.
+
+## Requirements
+
+This skill requires a `personas/` directory in your project with one markdown file per expert-lens, named `<domain>__<slug>.md` (e.g. `personas/falsifiability__popper.md`). Each persona file must include YAML frontmatter with: `name`, `domain`, `expert_slug`, `when_to_invoke`, `signature_techniques`, `anti_patterns_called_out`, `provenance`, `lens_type: persona` (or `lens`). See the `personas/` examples shipped alongside this skill for the schema template. Without a `personas/` directory, `/tribunal` refuses the invocation.
 
 ## Inputs
 
 - **`proposition`** (required) — the claim or decision to verdict. Phrased as a complete sentence the lenses can argue with. *"Should we ship X?"*, *"Is claim Y supported?"*, *"Does pattern Z apply here?"*
-- **`--lenses=slug1,slug2,slug3`** (optional) — list of persona slugs from `personas/`. Default: 3 most-relevant lenses chosen from the persona library based on the proposition's domain. Max: 5 (beyond 5, the residue stops being signal and starts being noise).
+- **`--lenses=slug1,slug2,slug3`** (optional) — list of persona slugs from your project's `personas/` directory. Default: 3 most-relevant lenses chosen by matching the proposition's domain against each persona's `when_to_invoke` field. Max: 5 (beyond 5, the residue stops being signal and starts being noise).
 - **`--mode=verdict|dissent|both`** (optional, default `both`) — `verdict` returns only the majority + recommended move; `dissent` returns only the disagreements + residue; `both` returns the full structure.
 
 ## Workflow
@@ -24,7 +28,7 @@ The driving question: *what does each load-bearing lens see in this proposition 
 ### Phase 1 — Parse the proposition and select lenses
 
 1. Read the proposition. If it is not a complete declarative or interrogative sentence the lenses could agree or disagree with, **refuse** the invocation and ask the operator to sharpen the framing.
-2. If `--lenses` not supplied: select 3 from `personas/` by `when_to_invoke` field matching the proposition's domain. Honest about the selection — print which 3 were chosen and why.
+2. If `--lenses` not supplied: select 3 from the project's `personas/` directory by `when_to_invoke` field matching the proposition's domain. Honest about the selection — print which 3 were chosen and why. If `personas/` doesn't exist, refuse and direct the operator to the Requirements section above.
 3. Validate each lens slug resolves to a real file in `personas/<domain>__<slug>.md`. Unresolved slug = hard refusal (do not silently substitute).
 
 ### Phase 2 — Bind each lens to a subagent (parallel dispatch)
@@ -158,9 +162,8 @@ The skill ships with this gate, not around it.
 
 ## Related
 
-- `personas/falsifiability__popper.md`, `personas/dual-process__kahneman.md`, `personas/eliza-refusal__weizenbaum.md` — humanities lenses 1–3
-- `personas/typescript-tooling__cherny.md` and other technical lenses — can also be used as `/tribunal` voters when the proposition is technical
 - `skills/reflect/SKILL.md` — paired retrospective skill; `/tribunal` produces structured disagreement, `/reflect` does the lens-bound retrospective
 - `skills/iterate/SKILL.md` — sibling skill for narrow-optimization-under-deadline; different shape, same operator-cognitive family
-- `~/.claude/skills/karpathy-bar/SKILL.md` — quality-bar skill; gate for `/tribunal` itself before merge
-- `plans/papers/persona-extensions/llm-council-prior-art.md` — prior-art survey (mechanism + attribution)
+- `skills/karpathy-bar/SKILL.md` — quality-bar skill; recommended gate for `/tribunal` output before commit
+- Example persona files (humanities lenses): `personas/falsifiability__popper.md` (Popperian falsifiability gate), `personas/dual-process__kahneman.md` (System 1/2 + bias detection), `personas/eliza-refusal__weizenbaum.md` (refuse-to-verdict for nonexistent-AI claims). Use these as schema templates for your own domain-specific persona files.
+- Prior-art: [karpathy/llm-council](https://github.com/karpathy/llm-council) — the fan-out shape `/tribunal` inverts (council collapses to Chairman consensus; tribunal preserves disagreement as terminal state).

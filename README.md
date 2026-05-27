@@ -1,6 +1,8 @@
 # Claude Second Brain
 
-A safety-first workflow toolkit for [Claude Code](https://docs.anthropic.com/en/docs/claude-code): 27 dynamically extandable slash commands + 17 agents that enforce predictable, auditable, quality-gated development — plus a local memory system that persists across sessions.
+> **The belief layer your agent runtime can't ship alone.** Confidence-weighted memory + deterministic contradiction detection + Coherence Yield metric + `/tribunal` multi-lens decision primitive — a belief-tracking + behavioral-coherence substrate for [Claude Code](https://docs.anthropic.com/en/docs/claude-code).
+
+A safety-first workflow toolkit for Claude Code: 27+ dynamically extendable slash commands + 17 agents that enforce predictable, auditable, quality-gated development — plus a local memory system that persists across sessions, tracks confidence on every belief, and surfaces contradictions before they corrupt downstream reasoning.
 
 **Before anything else:** `/metaprompt` turns a vague ask into a structured execution plan a senior engineer would write. Here is what that looks like.
 
