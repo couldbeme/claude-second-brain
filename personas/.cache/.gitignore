@@ -1,0 +1,4 @@
+# Cache of persona freshness recaps — local per machine, never synced.
+# Each machine fetches its own; the whole point is freshness.
+*
+!.gitignore

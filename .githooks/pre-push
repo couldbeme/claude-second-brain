@@ -1,0 +1,48 @@
+#!/usr/bin/env bash
+# Auto-docs pre-push hook.
+#
+# Runs scripts/auto-docs/run_all.py against HEAD. If it produces a diff,
+# commits as `chore(docs): auto-sync` so the push includes both the original
+# commit AND the docs update — no force-push, no history rewrite.
+#
+# Skip per-push with: git push --no-verify
+# Bypass per-commit with: include `[skip auto-docs]` in the commit subject.
+
+set -euo pipefail
+
+REPO_ROOT="$(git rev-parse --show-toplevel)"
+PYTHON="${AUTO_DOCS_PYTHON:-python3}"
+RUN_ALL="$REPO_ROOT/tools/auto-docs/run_all.py"
+
+if [[ ! -f "$RUN_ALL" ]]; then
+  echo "auto-docs: run_all.py missing — skipping" >&2
+  exit 0
+fi
+
+# Refuse to run mid-rebase / mid-merge to avoid corrupting an in-progress state.
+if [[ -d "$REPO_ROOT/.git/rebase-merge" || -d "$REPO_ROOT/.git/rebase-apply" || -f "$REPO_ROOT/.git/MERGE_HEAD" ]]; then
+  echo "auto-docs: in-progress rebase/merge detected — skipping" >&2
+  exit 0
+fi
+
+# Refuse to run with a dirty working tree we don't own — bailing here is safer
+# than auto-staging the user's WIP changes.
+if [[ -n "$(git status --porcelain --untracked-files=no)" ]]; then
+  echo "auto-docs: uncommitted changes present — commit or stash first" >&2
+  echo "  (skip this hook for one push: git push --no-verify)" >&2
+  exit 1
+fi
+
+"$PYTHON" "$RUN_ALL"
+
+# Stage and commit any docs deltas. Loop guard inside run_all.py handles the case
+# where HEAD is already an auto-sync commit (run_all exits 0 without changes).
+DIFF="$(git status --porcelain CHANGELOG.md README.md docs/SKILLS.md examples/README.md 2>/dev/null || true)"
+if [[ -n "$DIFF" ]]; then
+  HEAD_SHA="$(git rev-parse --short HEAD)"
+  git add CHANGELOG.md README.md docs/SKILLS.md examples/README.md 2>/dev/null || true
+  git commit -m "chore(docs): auto-sync after ${HEAD_SHA}" >&2
+  echo "auto-docs: committed sync on top of ${HEAD_SHA}" >&2
+fi
+
+exit 0
