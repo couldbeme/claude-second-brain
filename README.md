@@ -4,9 +4,9 @@
 _Last auto-stamped: 2026-05-27 · Skills: 11 · Commands: 33_
 
 **Recent commits**
+- feat(persona/popper): add destructive-action falsifiability gate
 - feat: cherry-pick investigate + auto-docs + named-expert library from feat/investigate-skill
 - chore(gitignore): blanket-ignore plans/ — operator policy "never push plans"
-- chore: relocate karpathy-bar to csb + move prior-art to docs + ignore audits/.personal-backup + fix README counts
 <!-- AUTO-STAMP:END -->
 
 # Your AI agent stores contradictory beliefs without knowing it.
