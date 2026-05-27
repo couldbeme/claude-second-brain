@@ -21,15 +21,12 @@ id_rsa.pub
 *.swp
 *.swo
 
-# Private operator artifacts — strategy/marketing drafts not for public history
-plans/gumroad-pro-pack-draft.md
-plans/dist-research-track-*.md
-plans/dist-revised-track-*.md
-plans/PRIVATE-ARTIFACTS.md
-plans/PROMPT-LANGUAGE-DESIGN.md
-plans/REVISED-STRATEGY-*.md
-plans/DISTRIBUTION-PUNCH-LIST-*.md
-plans/AUTORESEARCH-BRAINSTORM.md
+# Private operator artifacts — strategy/marketing drafts NEVER pushed to remote.
+# The entire plans/ tree is local-only by policy: drafts, strategy notes, pricing,
+# distribution plans, paper-working artifacts, research scratch, autoresearch outputs.
+# If a plans/* file is genuinely publish-shaped (e.g. prior-art research), MOVE it
+# to docs/ — do NOT exception it back into git from plans/.
+plans/
 
 # Per-project audit outputs — operator strategy + cross-project findings, not toolkit deliverables
 audits/
