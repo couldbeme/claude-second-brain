@@ -1,8 +1,37 @@
 # Claude Second Brain
 
-> **The belief layer your agent runtime can't ship alone.** Confidence-weighted memory + deterministic contradiction detection + Coherence Yield metric + `/tribunal` multi-lens decision primitive — a belief-tracking + behavioral-coherence substrate for [Claude Code](https://docs.anthropic.com/en/docs/claude-code).
+# Your AI agent stores contradictory beliefs without knowing it.
+# csb tells you — with a number.
 
-A safety-first workflow toolkit for Claude Code: 27+ dynamically extendable slash commands + 17 agents that enforce predictable, auditable, quality-gated development — plus a local memory system that persists across sessions, tracks confidence on every belief, and surfaces contradictions before they corrupt downstream reasoning.
+> _GIF placeholder: terminal showing agent writing a memory that contradicts an earlier one → contradiction-detected row fires → CY score drops 0.94 → 0.81 → `/reflect` clears it → CY recovers to 0.89. (Record + paste once `install.sh` lands.)_
+
+**Coherence Yield: 0.94 → 0.71 → 0.89.** A quantified trust score for agent memory. **9 deterministic inversion-pair classes** (always/never, works/broken, enabled/disabled, …). **No LLM in the contradiction detector.** Wilson 95% CI on every score. Queryable from any process. Adversary-resistant (F3 gaming-attack defense built in at [`memory-mcp/efficacy_measure.py:46-73`](memory-mcp/efficacy_measure.py)).
+
+Plus `/tribunal` — when consensus would lie:
+
+```
+/tribunal "should I rewrite this in Rust?"
+
+[Popper-falsifiability]:  refused — claim not phrased to be falsifiable
+[Kahneman-dual-process]:  oppose 0.7 — "Rust is fast" without measured baseline = bias
+[Weizenbaum-eliza]:       refused — future-maintenance claims can't be verified now
+
+verdict: NO CONSENSUS. operator decides.
+```
+
+No false "yes." **Structured disagreement is the deliverable.** Runtime-assembled from your project's `personas/` directory ([3 humanities lenses included as templates](personas/)).
+
+```bash
+# Install in 60 seconds
+git clone https://github.com/couldbeme/claude-second-brain.git
+cd claude-second-brain && bash install.sh
+```
+
+Built on the [Anthropic Agent Skills](https://github.com/anthropics/skills) standard — `/tribunal`, `/karpathy-bar`, `/iterate`, `/metaprompt` are spec-compatible across Claude Code + Claude.ai + Codex CLI (not yet cross-harness tested).
+
+**csb is a belief-tracking + behavioral-coherence substrate, not a memory toolkit.** CY measures internal memory consistency — not external correctness. It's a coherence score, not a truth score. Full architecture below.
+
+---
 
 **Before anything else:** `/metaprompt` turns a vague ask into a structured execution plan a senior engineer would write. Here is what that looks like.
 
