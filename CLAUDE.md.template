@@ -44,11 +44,13 @@ When spawning subagents:
 
 ## Self-Learning Protocol
 
+> **How this actually works (read first).** This protocol is a *behavioral rule* — Claude follows it each session; there is no background daemon enforcing it. Durable storage is **markdown files in your project's auto-memory directory**, which are loaded into context at session start. The `memory_save` / `memory_context` tools mentioned below are an **optional MCP layer** (the `memory` server): they only do something if you've connected it, and what they write is *not* auto-loaded into a future session. So: write the **markdown** for anything you need back next session; treat `memory_save` as an optional vector-recall mirror, never the source of truth.
+
 When you discover something non-obvious about a project (gotcha, working command, pattern):
 - Note it in your response with a `[LEARNING]` tag.
 - **Immediately** write the learning to the project's auto-memory directory (create topic files as needed, e.g., `debugging.md`, `patterns.md`). Do not wait for session end.
 - At session end or on `/learn`, also propose additions to the relevant CLAUDE.md.
-- Use `memory_save` with appropriate category, tags, and importance.
+- Primary path: the markdown write above (it's re-loaded next session). Optional: if the `memory` MCP server is connected, also `memory_save` with category/tags/importance for vector recall — but the markdown is what survives.
 - Keep additions to one line per concept. Dense over verbose.
 
 ### Layer 1: Auto-capture triggers (technical learning)
@@ -106,7 +108,7 @@ Beyond explicit corrections, detect these conversational signals that indicate s
 
 ### Layer 3: User model observation (silent)
 
-Maintain a behavioral profile that auto-updates across sessions. Store observations using `memory_save` with `category="user_model"` and `source="inferred"`. Never surface these observations directly -- use them silently to adapt interaction quality.
+Maintain a behavioral profile across sessions. This is a behavioral rule — *you* update it; nothing auto-updates it for you. Append observations to a `user_profile.md` in the auto-memory directory (the always-reloaded path). Never surface these observations directly -- use them silently to adapt interaction quality.
 
 **What to observe and adapt:**
 
@@ -118,9 +120,9 @@ Maintain a behavioral profile that auto-updates across sessions. Store observati
 - **Implicit preferences** -- User reformats your output = format preference. User modifies your code = style preference. Track and adapt.
 
 **Session lifecycle:**
-1. Session start: load user model from memory (`category="user_model"`, top by importance)
+1. Session start: load user model from `user_profile.md` in auto-memory (and the `memory` MCP server too, if connected)
 2. During session: observe signals, adapt responses in real-time
-3. Session end (or on `/learn`): flush updated observations to memory
+3. Session end (or on `/learn`): flush updated observations to `user_profile.md`
 
 **Rules:**
 - Require 3+ occurrences before storing a new observation (debounce noise)
@@ -164,12 +166,11 @@ If the user model would lead you to agree with something you believe is wrong, b
 ## Context Recovery (conversation compacting)
 
 When you notice context has been compressed or you've lost track of the current task:
-- Use `memory_context` tool with the current task description to reload relevant knowledge.
-- Use `/recall` to search for specific context you need.
-- Check the project's auto-memory directory for recent topic files.
+- Use `/recall` and the project's auto-memory directory (markdown) — the always-available recovery path.
+- If the `memory` MCP server is connected, `memory_context` with the task description reloads vector-indexed knowledge too (optional).
 - Read the project's CLAUDE.md for architecture and conventions.
 - Never guess what was discussed — ask the user or search memory first.
-- Before long operations, proactively save task context to memory with `memory_save` (category="context", importance=8).
+- Before long operations, proactively save task context to the markdown auto-memory (and `memory_save category="context"` if the MCP server is connected).
 
 ## Tool Usage Priorities
 

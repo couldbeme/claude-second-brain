@@ -4,17 +4,35 @@
 _Last auto-stamped: 2026-05-27 · Skills: 11 · Commands: 33_
 
 **Recent commits**
-- feat(persona/popper): add destructive-action falsifiability gate
 - feat: cherry-pick investigate + auto-docs + named-expert library from feat/investigate-skill
 - chore(gitignore): blanket-ignore plans/ — operator policy "never push plans"
+- chore: relocate karpathy-bar to csb + move prior-art to docs + ignore audits/.personal-backup + fix README counts
 <!-- AUTO-STAMP:END -->
 
 # Your AI agent stores contradictory beliefs without knowing it.
 # csb tells you — with a number.
 
-> _GIF placeholder: terminal showing agent writing a memory that contradicts an earlier one → contradiction-detected row fires → CY score drops 0.94 → 0.81 → `/reflect` clears it → CY recovers to 0.89. (Record + paste once `install.sh` lands.)_
+**Try it in 10 seconds — no install, runs the real detector:**
 
-**Coherence Yield: 0.94 → 0.71 → 0.89.** A quantified trust score for agent memory. **9 deterministic inversion-pair classes** (always/never, works/broken, enabled/disabled, …). **No LLM in the contradiction detector.** Wilson 95% CI on every score. Queryable from any process. Adversary-resistant (F3 gaming-attack defense built in at [`memory-mcp/efficacy_measure.py:46-73`](memory-mcp/efficacy_measure.py)).
+```bash
+python3 demo/coherence_check.py
+```
+```
+① BEFORE — the agent's stored beliefs:
+  contradictions : 3
+      ✗ “Standup is always at 9am.”            ⟂  “Standup is never at 9am anymore.”
+      ✗ “Deploy notifications are enabled.”     ⟂  “…disabled to cut noise.”
+      ✗ “The staging API key is required.”      ⟂  “…optional now we use OIDC.”
+  Coherence Yield : 0.36  [███████             ]
+② AFTER — stale beliefs retired (the user corrected them):
+  Coherence Yield : 1.00  [████████████████████]
+```
+
+Real detector, real CY math, deterministic — `CY` recovers **0.36 → 1.00** as the contradictions resolve. Point it at your own memory export to find real ones: `python3 demo/coherence_check.py export.json`.
+
+![Coherence Yield demo — 3 contradictions fire, CY drops to 0.36, then recovers to 1.00 as the stale beliefs are retired (a real run of demo/coherence_check.py)](demo/coherence-check.gif)
+
+**Coherence Yield** — a quantified consistency score for agent memory. **9 deterministic inversion-pair classes** (always/never, works/broken, enabled/disabled, …). **No LLM in the contradiction detector.** Wilson 95% CI on every score. Queryable from any process. Adversary-resistant (F3 gaming-attack defense at [`memory-mcp/efficacy_measure.py:46`](memory-mcp/efficacy_measure.py)). Runnable proof: [`demo/coherence_check.py`](demo/coherence_check.py). The deeper "why it composes into a language": [`docs/GRAMMAR.md`](docs/GRAMMAR.md).
 
 Plus `/tribunal` — when consensus would lie:
 
@@ -47,6 +65,8 @@ Built on the [Anthropic Agent Skills](https://github.com/anthropics/skills) stan
 ---
 
 ## What `/metaprompt` does (BEFORE/AFTER)
+
+![/metaprompt — a ~15-word fuzzy ask becomes a structured, phased, executable prompt (example from docs/METAPROMPT-EXAMPLES.md)](demo/metaprompt-demo.gif)
 
 **BEFORE** — what you type without it:
 

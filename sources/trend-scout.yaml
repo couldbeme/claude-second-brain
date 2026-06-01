@@ -1,0 +1,99 @@
+# Trend Scout — sector trends, funding flows, launches.
+# WORKED EXAMPLE of the source registry (schema: sources/_SCHEMA.md).
+# X is the primary signal source; default tier is free web recon ($0). The paid
+# x_recent_search tier is declared but disabled until an operator X_BEARER_TOKEN exists.
+scout: trend-scout
+mandate: >
+  Surface emerging sector trends, funding flows, and product launches early — from
+  what founders, operators, and VCs are saying on X right now — so the Niche Hunter
+  and the expert panel reason over fresh signal, not stale press.
+
+schedule:
+  cron: "0 13 * * *"        # daily 13:00 UTC, unattended
+  host: schedule            # native /schedule cron routine (openclaw-portable later)
+
+budget:
+  run_ceiling_usd: 0.00     # free-web-only until operator opts into the paid tier
+  cost_ledger: true
+
+sinks:
+  belief_db: true                                   # canonical (dedup/contradiction/confidence)
+  obsidian_vault: "${OBSIDIAN_VAULT:-./intel-vault}"  # human mirror (intel_mirror.py)
+
+sources:
+  # --- PRIMARY: X via free web recon (the directive, $0 default) ----------------
+  - id: x-launch-pulse
+    type: x
+    access: web_search
+    enabled: true
+    query: >
+      ("just launched" OR "we shipped" OR "now in beta") (agents OR "AI agent"
+      OR LLM OR "dev tool") -is:retweet
+    lookback: 7d
+    freshness: { poll_every: 24h, stale_after: 72h }
+    gated_actions: [post, reply, follow, dm, like]
+    cost_per_call_usd: 0.0
+    provenance_required: true
+
+  - id: x-founder-pain
+    type: x
+    access: web_search
+    enabled: true
+    query: >
+      ("I wish there was" OR "why is there no" OR "biggest pain" OR "keeps breaking")
+      (founder OR SaaS OR startup OR agents) -is:retweet
+    lookback: 7d
+    freshness: { poll_every: 24h, stale_after: 72h }
+    gated_actions: [post, reply, follow, dm, like]
+    cost_per_call_usd: 0.0
+    provenance_required: true
+
+  - id: x-vc-signal
+    type: x
+    access: web_search
+    enabled: true
+    # Watch a curated set of operator/VC voices for funding + thesis signal.
+    handles: ["@paulg", "@bgurley", "@eladgil", "@gokulr", "@rabois", "@naval"]
+    query: "funding OR raised OR thesis OR market"
+    lookback: 14d
+    freshness: { poll_every: 24h, stale_after: 168h }
+    gated_actions: [post, reply, follow, dm, like]
+    cost_per_call_usd: 0.0
+    provenance_required: true
+
+  # --- PAID X tier: declared, DISABLED until operator provides the key ----------
+  - id: x-recent-search-structured
+    type: x
+    access: x_recent_search
+    enabled: false                     # flip to true only when X_BEARER_TOKEN present
+    query: >
+      (agents OR "AI agent" OR "dev tool") (launch OR pain OR pricing)
+    lookback: 7d
+    freshness: { poll_every: 12h, stale_after: 48h }
+    credential_env: X_BEARER_TOKEN     # env var NAME only — never a literal token
+    gated_actions: [post, reply, follow, dm, like]
+    cost_per_call_usd: 0.005
+    provenance_required: true
+
+  # --- SECONDARY corroboration (free, non-X) ------------------------------------
+  - id: hn-frontpage
+    type: rss
+    access: rss
+    enabled: true
+    url: "https://hnrss.org/frontpage"
+    lookback: 3d
+    freshness: { poll_every: 12h, stale_after: 48h }
+    gated_actions: []                  # read-only feed; nothing outward
+    cost_per_call_usd: 0.0
+    provenance_required: true
+
+  - id: gmail-sector-newsletters
+    type: mcp_connector
+    access: mcp                        # already-connected Gmail connector (label-scoped)
+    enabled: true
+    query: "label:startup-intel"       # operator subscribes newsletters to this label
+    lookback: 7d
+    freshness: { poll_every: 24h, stale_after: 168h }
+    gated_actions: []                  # reading a label the operator curated = free
+    cost_per_call_usd: 0.0
+    provenance_required: true

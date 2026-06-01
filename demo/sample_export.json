@@ -1,0 +1,13 @@
+{
+  "_comment": "A SAMPLE memory export in the openclaw/Mem0 shape — for testing demo/coherence_check.py. Mostly-coherent beliefs with two real contradictions, so CY lands mid-range like real memory. Replace with a real export to find real contradictions.",
+  "memories": [
+    {"id": "t1", "content": "The home thermostat is always set to 21C.", "tags": ["home", "thermostat"], "confidence": 0.8},
+    {"id": "t2", "content": "Thermostat is never above 19C to save energy.", "tags": ["home", "thermostat"], "confidence": 0.7},
+    {"id": "h1", "content": "The home wifi network is called Skylark.", "tags": ["home", "network"], "confidence": 0.9},
+    {"id": "e1", "content": "Email auto-reply is enabled while the user is travelling.", "tags": ["email", "travel"], "confidence": 0.85},
+    {"id": "e2", "content": "Auto-reply is disabled, the user finds it rude.", "tags": ["email", "travel"], "confidence": 0.6},
+    {"id": "em1", "content": "The email signature includes the user's phone number.", "tags": ["email"], "confidence": 0.85},
+    {"id": "tr1", "content": "The user travels for work about twice a month.", "tags": ["travel", "schedule"], "confidence": 0.8},
+    {"id": "p1", "content": "The user's partner is named Dana.", "tags": ["people"], "confidence": 0.95}
+  ]
+}

@@ -1,0 +1,14 @@
+{
+  "n": 34,
+  "n_abstain": 0,
+  "raw_agreement": 0.8529411764705882,
+  "kappa": 0.7058823529411764,
+  "both_yes": 12,
+  "both_no": 17,
+  "disagree": 5,
+  "model_a": "qwen/qwen3-vl-8b",
+  "model_b": "llama-3.2-3b-instruct",
+  "pairs_total": 34,
+  "interpretation": "substantial"
+}
+__DONE__

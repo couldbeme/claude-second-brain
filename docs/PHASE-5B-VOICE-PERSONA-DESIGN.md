@@ -103,7 +103,7 @@ Mirror `metaprompt_hook.py`'s safety contract exactly:
 `mcp-bridge/voice_persona_hook.py` is invoked by Claude Code's UserPromptSubmit hook, reading event JSON from stdin (same shape as metaprompt_hook). Standalone invocation for testing:
 
 ```bash
-echo '{"prompt": "WHY did you do that?!", "cwd": "/Users/macbook/Dev/x"}' \
+echo '{"prompt": "WHY did you do that?!", "cwd": "~/Dev/x"}' \
   | ~/.claude/memory-mcp/.venv/bin/python3 mcp-bridge/voice_persona_hook.py --dry-run
 # Emits to stderr:
 # [VOICE] caps-burst: "WHY did you do that?!"

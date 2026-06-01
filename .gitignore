@@ -33,3 +33,15 @@ audits/
 
 # install.sh sync backups of pre-existing local skill files (auto-generated)
 *.personal-backup
+
+# P2 real-trace data — contains operator/project context; NEVER commit (local only)
+eval/p2_real_verdicts.jsonl
+eval/p2_rejudge_fullpayload.jsonl
+eval/real_traces*.jsonl
+
+# startup-intel: Obsidian mirror vault is a local-only derived view (may hold operator strategy)
+intel-vault/
+
+# never track a local X/xAI token file
+.x_bearer_token
+*bearer*token*

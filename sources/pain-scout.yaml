@@ -1,0 +1,63 @@
+# Pain Scout — surface founders/builders voicing pain around agent reliability.
+# Doubles as a LEAD ENGINE: each high-signal pain post is a candidate for the
+# agent-reliability audit offer. X-first, free web recon ($0) by default.
+scout: pain-scout
+mandate: >
+  Find people on X right now saying their AI agent silently drifts off its rules,
+  forgets constraints, or breaks in long tasks — the exact pain the commitment-drift
+  audit fixes. Rank by how acute + how reachable. Output is a "who's in pain" feed.
+
+schedule:
+  # NOTE: gather needs WebSearch (a model tool). Running this on /schedule via claude -p
+  # draws the METERED Agent-SDK pool from 2026-06-15 (NOT free). So default = INTERACTIVE
+  # (operator runs /pain-scout in the terminal = free via subscription). Only schedule
+  # once an X_BEARER_TOKEN makes a model-free collector possible, or you accept the meter.
+  cron: null
+  host: interactive
+
+budget:
+  run_ceiling_usd: 0.00     # free web recon only; never spend without operator opt-in
+  cost_ledger: true
+
+sinks:
+  belief_db: true
+  obsidian_vault: "${OBSIDIAN_VAULT:-./intel-vault}"
+
+sources:
+  - id: x-agent-reliability-pain
+    type: x
+    access: web_search        # free; reuse /x-launch-recon discipline
+    enabled: true
+    query: >
+      ("my agent" OR "the agent" OR "AI agent" OR LLM) ("forgets" OR "ignores
+      instructions" OR "drifts" OR "goes off the rails" OR "keeps breaking" OR
+      "stopped following") -is:retweet
+    lookback: 7d
+    freshness: { poll_every: 24h, stale_after: 72h }
+    gated_actions: [reply, dm, follow, like, post]   # ALL outward contact is gated
+    cost_per_call_usd: 0.0
+    provenance_required: true
+
+  - id: x-wish-this-existed
+    type: x
+    access: web_search
+    enabled: true
+    query: >
+      ("I wish" OR "why is there no" OR "someone should build") (agent OR agents OR
+      LLM OR "AI tool") (reliable OR reliability OR "follows rules" OR guardrail) -is:retweet
+    lookback: 7d
+    freshness: { poll_every: 24h, stale_after: 72h }
+    gated_actions: [reply, dm, follow, like, post]
+    cost_per_call_usd: 0.0
+    provenance_required: true
+
+  - id: reddit-agent-pain
+    type: rss
+    access: rss               # free corroboration outside X
+    enabled: true
+    url: "https://www.reddit.com/r/AI_Agents/new/.rss"
+    lookback: 7d
+    freshness: { poll_every: 24h, stale_after: 72h }
+    gated_actions: []
+    cost_per_call_usd: 0.0
+    provenance_required: true

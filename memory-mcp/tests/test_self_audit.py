@@ -549,7 +549,10 @@ class TestCLI(unittest.TestCase):
 
     def test_quiet_suppresses_output_when_clean(self):
         with tempfile.TemporaryDirectory() as tmp:
-            result = self._run_cli(["--target", tmp, "--quiet"])
+            # --no-session: R-SESSION-1 reports on the AMBIENT session's context use
+            # (orthogonal to --target). Without isolating it, this test flakes when the
+            # running session is full enough to trigger that finding.
+            result = self._run_cli(["--target", tmp, "--quiet", "--no-session"])
             self.assertEqual(result.returncode, 0)
             self.assertEqual(result.stdout.strip(), "")
 

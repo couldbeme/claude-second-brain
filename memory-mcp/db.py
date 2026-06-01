@@ -49,6 +49,7 @@ class MemoryDB:
                 access_count INTEGER DEFAULT 0,
                 visibility TEXT NOT NULL DEFAULT 'personal',
                 confidence REAL DEFAULT 0.75,
+                surprise REAL DEFAULT 0.0,
                 valid_time TEXT,
                 transaction_time TEXT DEFAULT (datetime('now')),
                 created_at TEXT DEFAULT (datetime('now')),
@@ -75,6 +76,10 @@ class MemoryDB:
         if "confidence" not in columns:
             self.conn.execute(
                 "ALTER TABLE memories ADD COLUMN confidence REAL DEFAULT 0.75"
+            )
+        if "surprise" not in columns:
+            self.conn.execute(
+                "ALTER TABLE memories ADD COLUMN surprise REAL DEFAULT 0.0"
             )
         if "valid_time" not in columns:
             self.conn.execute(
@@ -253,10 +258,73 @@ class MemoryDB:
 
         self.conn.commit()
 
-        # Contradiction detection (non-blocking)
-        self._detect_contradictions(mem_id, content, project, tags or [])
+        # Contradiction detection (non-blocking) — returns conflicting prior IDs
+        conflict_ids = self._detect_contradictions(mem_id, content, project, tags or [])
+
+        # Surprise-weighting: how much this memory diverged from the store.
+        self._compute_surprise(mem_id, project, tags or [], conflict_ids)
 
         return mem_id
+
+    # Surprise weights: contradiction dominates; novelty is a small secondary term.
+    _SURPRISE_W_CONFLICT = 0.8
+    _SURPRISE_W_NOVELTY = 0.2
+
+    def _compute_surprise(
+        self,
+        mem_id: str,
+        project: Optional[str],
+        tags: list[str],
+        conflict_ids: list[str],
+    ) -> float:
+        """Compute + store a salience score for a just-saved memory (v0.1 heuristic).
+
+        surprise = clamp(W_c * max_conflict_confidence + W_n * novelty, 0, 1)
+          - max_conflict_confidence: highest confidence among contradicted priors
+            (contradicting a belief the store was SURE of is surprising; 0 if none).
+          - novelty: fraction of this memory's tags never seen before in the same
+            project (a cheap new-topic proxy).
+
+        A salience signal over records — NOT a claim the system "is surprised".
+        Advisory: written to its own `surprise` column; does NOT touch `importance`.
+        """
+        # max confidence among the contradicted priors
+        max_conf = 0.0
+        if conflict_ids:
+            placeholders = ",".join("?" for _ in conflict_ids)
+            rows = self.conn.execute(
+                f"SELECT confidence FROM memories WHERE id IN ({placeholders})",
+                list(conflict_ids),
+            ).fetchall()
+            confs = [r[0] for r in rows if r[0] is not None]
+            max_conf = max(confs) if confs else 0.0
+
+        # novelty: fraction of tags not previously seen in this project (excluding self)
+        novelty = 0.0
+        if tags:
+            if project is None:
+                proj_cond, proj_param = "project IS NULL", []
+            else:
+                proj_cond, proj_param = "project = ?", [project]
+            seen = 0
+            for t in tags:
+                cnt = self.conn.execute(
+                    f"SELECT COUNT(*) FROM memories "
+                    f"WHERE {proj_cond} AND id != ? AND tags LIKE ?",
+                    proj_param + [mem_id, f'%"{t}"%'],
+                ).fetchone()[0]
+                if cnt > 0:
+                    seen += 1
+            novelty = 1.0 - (seen / len(tags))
+
+        surprise = (self._SURPRISE_W_CONFLICT * max_conf
+                    + self._SURPRISE_W_NOVELTY * novelty)
+        surprise = max(0.0, min(1.0, surprise))
+        self.conn.execute(
+            "UPDATE memories SET surprise = ? WHERE id = ?", (surprise, mem_id)
+        )
+        self.conn.commit()
+        return surprise
 
     def get(self, mem_id: str) -> Optional[dict]:
         """Get a memory by ID. Increments access_count."""
@@ -660,6 +728,117 @@ class MemoryDB:
                 conflicts.append(cand_id)
 
         return conflicts
+
+    def tag_neighbors(
+        self,
+        tags: list[str],
+        project: Optional[str] = None,
+        since_days: int = 30,
+        exclude_id: Optional[str] = None,
+    ) -> list[dict]:
+        """Recent same-project memories sharing >=1 tag — WITHOUT the structural
+        inversion filter. The semantic gate tier needs these candidates (the
+        paraphrase clashes the token check in find_conflicts would skip).
+
+        Returns: list of {id, content, confidence} (empty if no tags/neighbors).
+        """
+        if not tags:
+            return []
+
+        tag_conditions = " OR ".join(["tags LIKE ?" for _ in tags])
+        tag_params: list = [f'%"{t}"%' for t in tags]
+
+        if project is None:
+            project_condition = "project IS NULL"
+            project_params: list = []
+        else:
+            project_condition = "project = ?"
+            project_params = [project]
+
+        query = f"""
+            SELECT id, content, confidence FROM memories
+            WHERE ({tag_conditions})
+              AND {project_condition}
+              AND transaction_time >= datetime('now', ?)
+        """
+        params = tag_params + project_params + [f"-{int(since_days)} days"]
+        try:
+            rows = self.conn.execute(query, params).fetchall()
+        except sqlite3.OperationalError:
+            return []
+
+        out: list[dict] = []
+        for (mid, content, conf) in rows:
+            if exclude_id is not None and mid == exclude_id:
+                continue
+            out.append({
+                "id": mid,
+                "content": content,
+                "confidence": conf if conf is not None else 0.75,
+            })
+        return out
+
+    def find_conflicts(
+        self,
+        content: str,
+        tags: list[str],
+        project: Optional[str] = None,
+        since_days: int = 30,
+    ) -> list[dict]:
+        """Read-only, pre-save twin of _detect_contradictions.
+
+        Returns existing memories that a CANDIDATE belief (`content`, `tags`)
+        would invert — WITHOUT inserting the candidate or writing any
+        contradictions row. Each result carries the existing memory's
+        confidence so a caller can apply a load-bearing threshold (the gate).
+
+        Returns: list of {id, content, confidence} (empty if no conflict).
+        """
+        if not tags:
+            return []
+
+        new_tokens = self._tokenize(content)
+        if new_tokens & self._QUALIFIERS:
+            return []
+
+        tag_conditions = " OR ".join(["tags LIKE ?" for _ in tags])
+        tag_params: list = [f'%"{t}"%' for t in tags]
+
+        if project is None:
+            project_condition = "project IS NULL"
+            project_params: list = []
+        else:
+            project_condition = "project = ?"
+            project_params = [project]
+
+        query = f"""
+            SELECT id, content, confidence FROM memories
+            WHERE ({tag_conditions})
+              AND {project_condition}
+              AND transaction_time >= datetime('now', ?)
+        """
+        params = tag_params + project_params + [f"-{int(since_days)} days"]
+
+        try:
+            candidates = self.conn.execute(query, params).fetchall()
+        except sqlite3.OperationalError:
+            return []
+
+        out: list[dict] = []
+        for (cand_id, cand_content, cand_conf) in candidates:
+            cand_tokens = self._tokenize(cand_content)
+            if cand_tokens & self._QUALIFIERS:
+                continue
+            for (word_a, word_b) in self._INVERSION_PAIRS:
+                if (word_a in new_tokens and word_b in cand_tokens) or \
+                   (word_b in new_tokens and word_a in cand_tokens):
+                    out.append({
+                        "id": cand_id,
+                        "content": cand_content,
+                        "confidence": cand_conf if cand_conf is not None else 0.75,
+                    })
+                    break
+        return out
 
     def get_contradictions(self, mem_id: str) -> list[str]:
         """
