@@ -6,6 +6,8 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); version
 ## [Unreleased]
 
 ### Added
+- commitment-drift detector + eval/benchmarks + coherence gate + runnable demos + agent toolkit
+- **persona/popper**: add destructive-action falsifiability gate
 - cherry-pick investigate + auto-docs + named-expert library from feat/investigate-skill
 - **install**: sync skills/ + personas/ to ~/.claude/ alongside agents + commands
 - ship operator-cognitive trio + 4 personas + llm-council survey
